@@ -1,4 +1,7 @@
-{
+import json
+import os
+
+notebook = {
  "cells": [
   {
    "cell_type": "markdown",
@@ -25,7 +28,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -52,7 +55,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -95,7 +98,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -140,7 +143,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -165,3 +168,8 @@
  "nbformat": 4,
  "nbformat_minor": 2
 }
+
+with open("notebooks/low_floor_bus_equity_analysis.ipynb", "w", encoding="utf-8") as f:
+    json.dump(notebook, f, ensure_ascii=False, indent=1)
+
+print("Updated notebooks/low_floor_bus_equity_analysis.ipynb with rigorous statistical calculations!")

@@ -1,4 +1,12 @@
-<!DOCTYPE html>
+import json
+
+with open("results/sido_data.json", "r", encoding="utf-8") as f:
+    sido_json = f.read()
+
+with open("results/gg_data.json", "r", encoding="utf-8") as f:
+    gg_json = f.read()
+
+html_content = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
+        :root {{
             --bg-body: #0a0f1d;
             --bg-card: rgba(18, 26, 47, 0.75);
             --bg-card-hover: rgba(28, 38, 68, 0.85);
@@ -25,15 +33,15 @@
             --accent-cyan: #06b6d4;
             --accent-amber: #f59e0b;
             --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-        }
+        }}
 
-        * {
+        * {{
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
+        }}
 
-        body {
+        body {{
             font-family: var(--font-family);
             background-color: var(--bg-body);
             color: var(--text-main);
@@ -44,10 +52,10 @@
                 radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
-        }
+        }}
 
         /* Responsive Navigation Bar with Hamburger Menu */
-        .navbar {
+        .navbar {{
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -56,17 +64,17 @@
             background: rgba(10, 15, 29, 0.88);
             border-bottom: 1px solid var(--border-glass);
             padding: 12px 24px;
-        }
+        }}
 
-        .nav-inner {
+        .nav-inner {{
             max-width: 1240px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
+        }}
 
-        .nav-brand {
+        .nav-brand {{
             display: flex;
             align-items: center;
             gap: 10px;
@@ -74,43 +82,43 @@
             font-size: 1.0rem;
             color: #fff;
             text-decoration: none;
-        }
+        }}
 
-        .nav-brand .badge {
+        .nav-brand .badge {{
             background: linear-gradient(135deg, #2563eb, #3b82f6);
             color: #fff;
             font-size: 0.72rem;
             padding: 3px 8px;
             border-radius: 6px;
             font-weight: 700;
-        }
+        }}
 
-        .nav-menu {
+        .nav-menu {{
             display: flex;
             align-items: center;
             gap: 20px;
             list-style: none;
-        }
+        }}
 
-        .nav-menu a {
+        .nav-menu a {{
             color: var(--text-muted);
             text-decoration: none;
             font-size: 0.88rem;
             font-weight: 500;
             transition: all 0.2s ease;
-        }
+        }}
 
-        .nav-menu a:hover {
+        .nav-menu a:hover {{
             color: #fff;
-        }
+        }}
 
-        .nav-actions {
+        .nav-actions {{
             display: flex;
             gap: 8px;
             align-items: center;
-        }
+        }}
 
-        .btn-code {
+        .btn-code {{
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -123,27 +131,27 @@
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s ease;
-        }
+        }}
 
-        .btn-code:hover {
+        .btn-code:hover {{
             background: rgba(255, 255, 255, 0.14);
             border-color: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
-        }
+        }}
 
-        .btn-code.primary {
+        .btn-code.primary {{
             background: rgba(59, 130, 246, 0.15);
             border-color: rgba(59, 130, 246, 0.35);
             color: #93c5fd;
-        }
+        }}
 
-        .btn-code.primary:hover {
+        .btn-code.primary:hover {{
             background: rgba(59, 130, 246, 0.25);
             color: #bfdbfe;
-        }
+        }}
 
         /* Mobile Hamburger Toggle */
-        .nav-toggle {
+        .nav-toggle {{
             display: none;
             background: none;
             border: none;
@@ -151,26 +159,26 @@
             font-size: 1.5rem;
             cursor: pointer;
             padding: 4px;
-        }
+        }}
 
-        .mobile-only {
+        .mobile-only {{
             display: none;
-        }
+        }}
 
         /* Container */
-        .container {
+        .container {{
             max-width: 1200px;
             margin: 0 auto;
             padding: 30px 20px 80px 20px;
-        }
+        }}
 
         /* Hero Header */
-        .hero {
+        .hero {{
             text-align: center;
             padding: 50px 0 45px 0;
-        }
+        }}
 
-        .contest-tag {
+        .contest-tag {{
             display: inline-block;
             color: var(--accent-cyan);
             font-size: 0.85rem;
@@ -181,50 +189,50 @@
             border-radius: 30px;
             background: rgba(6, 182, 212, 0.1);
             border: 1px solid rgba(6, 182, 212, 0.25);
-        }
+        }}
 
-        .hero-title {
+        .hero-title {{
             font-size: 2.8rem;
             font-weight: 900;
             letter-spacing: -0.03em;
             line-height: 1.25;
             margin-bottom: 20px;
             color: #fff;
-        }
+        }}
 
-        .hero-title span {
+        .hero-title span {{
             background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
+        }}
 
-        .hero-desc {
+        .hero-desc {{
             font-size: 1.15rem;
             color: var(--text-muted);
             max-width: 860px;
             margin: 0 auto 26px auto;
             word-break: keep-all;
             line-height: 1.7;
-        }
+        }}
 
-        .hero-meta {
+        .hero-meta {{
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 16px;
             font-size: 0.84rem;
             color: var(--text-muted);
-        }
+        }}
 
-        .hero-meta span {
+        .hero-meta span {{
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-glass);
             padding: 5px 12px;
             border-radius: 20px;
-        }
+        }}
 
         /* Notice / Methodology Box */
-        .notice-box {
+        .notice-box {{
             background: rgba(59, 130, 246, 0.06);
             border: 1px solid rgba(59, 130, 246, 0.25);
             border-radius: 12px;
@@ -233,21 +241,21 @@
             font-size: 0.88rem;
             color: #cbd5e1;
             line-height: 1.6;
-        }
+        }}
 
-        .notice-box strong {
+        .notice-box strong {{
             color: #93c5fd;
-        }
+        }}
 
         /* KPI Banner (4 Stat Cards) */
-        .kpi-grid {
+        .kpi-grid {{
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 50px;
-        }
+        }}
 
-        .kpi-card {
+        .kpi-card {{
             background: var(--bg-card);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border-glass);
@@ -256,92 +264,92 @@
             position: relative;
             overflow: hidden;
             transition: all 0.25s ease;
-        }
+        }}
 
-        .kpi-card:hover {
+        .kpi-card:hover {{
             background: var(--bg-card-hover);
             transform: translateY(-2px);
             border-color: var(--border-highlight);
-        }
+        }}
 
-        .kpi-card::before {
+        .kpi-card::before {{
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 3px;
-        }
+        }}
 
-        .kpi-card.red::before { background: var(--accent-red); }
-        .kpi-card.blue::before { background: var(--primary); }
-        .kpi-card.cyan::before { background: var(--accent-cyan); }
-        .kpi-card.amber::before { background: var(--accent-amber); }
+        .kpi-card.red::before {{ background: var(--accent-red); }}
+        .kpi-card.blue::before {{ background: var(--primary); }}
+        .kpi-card.cyan::before {{ background: var(--accent-cyan); }}
+        .kpi-card.amber::before {{ background: var(--accent-amber); }}
 
-        .kpi-label {
+        .kpi-label {{
             font-size: 0.8rem;
             color: var(--text-muted);
             font-weight: 600;
             margin-bottom: 8px;
             text-transform: uppercase;
-        }
+        }}
 
-        .kpi-val {
+        .kpi-val {{
             font-size: 2.0rem;
             font-weight: 900;
             letter-spacing: -0.03em;
             line-height: 1.1;
             margin-bottom: 6px;
             color: #fff;
-        }
+        }}
 
-        .kpi-card.red .kpi-val { color: #f87171; }
-        .kpi-card.blue .kpi-val { color: #60a5fa; }
-        .kpi-card.cyan .kpi-val { color: #22d3ee; }
-        .kpi-card.amber .kpi-val { color: #fbbf24; }
+        .kpi-card.red .kpi-val {{ color: #f87171; }}
+        .kpi-card.blue .kpi-val {{ color: #60a5fa; }}
+        .kpi-card.cyan .kpi-val {{ color: #22d3ee; }}
+        .kpi-card.amber .kpi-val {{ color: #fbbf24; }}
 
-        .kpi-sub {
+        .kpi-sub {{
             font-size: 0.8rem;
             color: var(--text-muted);
             line-height: 1.45;
-        }
+        }}
 
         /* Section Layout */
-        .section {
+        .section {{
             margin-bottom: 65px;
-        }
+        }}
 
-        .section-header {
+        .section-header {{
             margin-bottom: 22px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border-glass);
-        }
+        }}
 
-        .section-tag {
+        .section-tag {{
             font-size: 0.8rem;
             color: var(--primary);
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             margin-bottom: 4px;
-        }
+        }}
 
-        .section-title {
+        .section-title {{
             font-size: 1.65rem;
             font-weight: 800;
             color: #fff;
             letter-spacing: -0.02em;
-        }
+        }}
 
         /* Grid 2 Column */
-        .grid-2col {
+        .grid-2col {{
             display: grid;
             grid-template-columns: 1.35fr 1fr;
             gap: 24px;
             align-items: stretch;
-        }
+        }}
 
-        .chart-box {
+        .chart-box {{
             background: var(--bg-card);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border-glass);
@@ -349,30 +357,30 @@
             padding: 22px;
             display: flex;
             flex-direction: column;
-        }
+        }}
 
-        .chart-header {
+        .chart-header {{
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 16px;
             flex-wrap: wrap;
             gap: 8px;
-        }
+        }}
 
-        .chart-title {
+        .chart-title {{
             font-size: 1.05rem;
             font-weight: 700;
             color: #fff;
-        }
+        }}
 
-        .chart-subtitle {
+        .chart-subtitle {{
             font-size: 0.8rem;
             color: var(--text-muted);
             margin-top: 2px;
-        }
+        }}
 
-        .chart-legend-box {
+        .chart-legend-box {{
             display: flex;
             gap: 12px;
             font-size: 0.78rem;
@@ -382,30 +390,30 @@
             background: rgba(0, 0, 0, 0.25);
             padding: 8px 12px;
             border-radius: 8px;
-        }
+        }}
 
-        .legend-item {
+        .legend-item {{
             display: flex;
             align-items: center;
             gap: 5px;
-        }
+        }}
 
-        .legend-dot {
+        .legend-dot {{
             width: 10px;
             height: 10px;
             border-radius: 50%;
             display: inline-block;
-        }
+        }}
 
-        .chart-canvas-container {
+        .chart-canvas-container {{
             position: relative;
             flex: 1;
             min-height: 420px;
             width: 100%;
-        }
+        }}
 
         /* Fallback alert if Chart.js fails */
-        .chart-fallback {
+        .chart-fallback {{
             display: none;
             padding: 20px;
             background: rgba(239, 68, 68, 0.1);
@@ -413,38 +421,38 @@
             border-radius: 8px;
             color: #fca5a5;
             font-size: 0.9rem;
-        }
+        }}
 
         /* Commentary Cards */
-        .analysis-card-col {
+        .analysis-card-col {{
             display: flex;
             flex-direction: column;
             gap: 16px;
-        }
+        }}
 
-        .story-card {
+        .story-card {{
             background: var(--bg-card);
             border: 1px solid var(--border-glass);
             border-radius: 14px;
             padding: 20px;
             transition: all 0.2s ease;
-        }
+        }}
 
-        .story-card:hover {
+        .story-card:hover {{
             border-color: var(--border-highlight);
-        }
+        }}
 
-        .story-card.danger {
+        .story-card.danger {{
             background: rgba(239, 68, 68, 0.05);
             border-color: rgba(239, 68, 68, 0.22);
-        }
+        }}
 
-        .story-card.primary {
+        .story-card.primary {{
             background: rgba(59, 130, 246, 0.05);
             border-color: rgba(59, 130, 246, 0.22);
-        }
+        }}
 
-        .story-title {
+        .story-title {{
             font-size: 1.0rem;
             font-weight: 700;
             margin-bottom: 8px;
@@ -452,18 +460,18 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
+        }}
 
-        .story-card.danger .story-title { color: #f87171; }
-        .story-card.primary .story-title { color: #60a5fa; }
+        .story-card.danger .story-title {{ color: #f87171; }}
+        .story-card.primary .story-title {{ color: #60a5fa; }}
 
-        .story-p {
+        .story-p {{
             font-size: 0.88rem;
             color: var(--text-muted);
             line-height: 1.65;
-        }
+        }}
 
-        .stat-badge {
+        .stat-badge {{
             display: inline-block;
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -472,10 +480,10 @@
             font-size: 0.8rem;
             color: #e2e8f0;
             font-family: monospace;
-        }
+        }}
 
         /* Clean Regression Code Block Box */
-        .math-code-box {
+        .math-code-box {{
             background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 8px;
@@ -485,31 +493,31 @@
             font-size: 0.84rem;
             color: #93c5fd;
             line-height: 1.5;
-        }
+        }}
 
         /* Table Design with Sticky First Column */
-        .table-wrap {
+        .table-wrap {{
             margin-top: 20px;
             background: var(--bg-card);
             border: 1px solid var(--border-glass);
             border-radius: 14px;
             overflow: hidden;
-        }
+        }}
 
-        .table-scroll {
+        .table-scroll {{
             overflow-x: auto;
             max-height: 480px;
-        }
+        }}
 
-        table {
+        table {{
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
             text-align: left;
             white-space: nowrap;
-        }
+        }}
 
-        th {
+        th {{
             background: #151f38;
             color: var(--text-muted);
             font-weight: 600;
@@ -518,102 +526,102 @@
             position: sticky;
             top: 0;
             z-index: 10;
-        }
+        }}
 
-        td {
+        td {{
             padding: 9px 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             color: var(--text-main);
-        }
+        }}
 
         /* Sticky first column */
-        th.sticky-col, td.sticky-col {
+        th.sticky-col, td.sticky-col {{
             position: sticky;
             left: 0;
             background: #111a30;
             z-index: 5;
             font-weight: 600;
             border-right: 1px solid var(--border-glass);
-        }
+        }}
 
-        th.sticky-col {
+        th.sticky-col {{
             z-index: 15;
             background: #17233f;
-        }
+        }}
 
-        tr:hover td {
+        tr:hover td {{
             background: rgba(255, 255, 255, 0.03);
-        }
+        }}
 
-        .badge-danger {
+        .badge-danger {{
             background: rgba(239, 68, 68, 0.15);
             color: #fca5a5;
             padding: 2px 7px;
             border-radius: 4px;
             font-weight: 700;
             font-size: 0.75rem;
-        }
+        }}
 
-        .badge-success {
+        .badge-success {{
             background: rgba(34, 197, 94, 0.15);
             color: #86efac;
             padding: 2px 7px;
             border-radius: 4px;
             font-weight: 700;
             font-size: 0.75rem;
-        }
+        }}
 
         /* 3-Column Root Cause Grid */
-        .cause-grid {
+        .cause-grid {{
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-        }
+        }}
 
-        .cause-card {
+        .cause-card {{
             background: var(--bg-card);
             border: 1px solid var(--border-glass);
             border-radius: 16px;
             padding: 26px 22px;
             transition: all 0.25s ease;
-        }
+        }}
 
-        .cause-card:hover {
+        .cause-card:hover {{
             background: var(--bg-card-hover);
             transform: translateY(-3px);
             border-color: var(--border-highlight);
-        }
+        }}
 
-        .cause-num {
+        .cause-num {{
             font-size: 2.0rem;
             font-weight: 900;
             color: rgba(255, 255, 255, 0.12);
             line-height: 1;
             margin-bottom: 12px;
-        }
+        }}
 
-        .cause-title {
+        .cause-title {{
             font-size: 1.1rem;
             font-weight: 700;
             color: #fff;
             margin-bottom: 10px;
             line-height: 1.35;
-        }
+        }}
 
-        .cause-desc {
+        .cause-desc {{
             font-size: 0.88rem;
             color: var(--text-muted);
             line-height: 1.65;
-        }
+        }}
 
         /* Policy Proposals */
-        .proposal-grid {
+        .proposal-grid {{
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-        }
+        }}
 
-        .proposal-card {
+        .proposal-card {{
             background: linear-gradient(180deg, rgba(30, 41, 75, 0.6) 0%, rgba(18, 26, 47, 0.8) 100%);
             border: 1px solid var(--border-glass);
             border-radius: 16px;
@@ -622,38 +630,38 @@
             flex-direction: column;
             justify-content: space-between;
             transition: all 0.25s ease;
-        }
+        }}
 
-        .proposal-card:hover {
+        .proposal-card:hover {{
             border-color: var(--primary);
             transform: translateY(-3px);
-        }
+        }}
 
-        .proposal-tag {
+        .proposal-tag {{
             font-size: 0.75rem;
             font-weight: 700;
             color: var(--accent-cyan);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 10px;
-        }
+        }}
 
-        .proposal-title {
+        .proposal-title {{
             font-size: 1.2rem;
             font-weight: 800;
             color: #fff;
             margin-bottom: 12px;
             line-height: 1.35;
-        }
+        }}
 
-        .proposal-body {
+        .proposal-body {{
             font-size: 0.88rem;
             color: var(--text-muted);
             line-height: 1.65;
             margin-bottom: 18px;
-        }
+        }}
 
-        .formula-box {
+        .formula-box {{
             background: rgba(0, 0, 0, 0.3);
             border: 1px dashed rgba(255, 255, 255, 0.15);
             border-radius: 8px;
@@ -662,18 +670,18 @@
             font-size: 0.8rem;
             color: #93c5fd;
             line-height: 1.45;
-        }
+        }}
 
         /* Limitations Box */
-        .limitations-box {
+        .limitations-box {{
             background: rgba(30, 41, 59, 0.5);
             border: 1px solid var(--border-glass);
             border-radius: 14px;
             padding: 24px;
             margin-top: 40px;
-        }
+        }}
 
-        .limitations-title {
+        .limitations-title {{
             font-size: 1.05rem;
             font-weight: 700;
             color: #cbd5e1;
@@ -681,47 +689,47 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
+        }}
 
-        .limitations-list {
+        .limitations-list {{
             padding-left: 20px;
             font-size: 0.86rem;
             color: var(--text-muted);
             line-height: 1.7;
-        }
+        }}
 
-        .limitations-list li {
+        .limitations-list li {{
             margin-bottom: 6px;
-        }
+        }}
 
         /* Footer */
-        .footer {
+        .footer {{
             border-top: 1px solid var(--border-glass);
             padding: 40px 0;
             text-align: center;
             color: var(--text-muted);
             font-size: 0.86rem;
             line-height: 1.8;
-        }
+        }}
 
-        .footer a {
+        .footer a {{
             color: var(--primary);
             text-decoration: none;
-        }
+        }}
 
-        .footer a:hover {
+        .footer a:hover {{
             text-decoration: underline;
-        }
+        }}
 
         /* Responsive Breakpoints */
-        @media (max-width: 960px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .grid-2col { grid-template-columns: 1fr; }
-            .cause-grid { grid-template-columns: 1fr; }
-            .proposal-grid { grid-template-columns: 1fr; }
-            .hero-title { font-size: 2.2rem; }
+        @media (max-width: 960px) {{
+            .kpi-grid {{ grid-template-columns: repeat(2, 1fr); }}
+            .grid-2col {{ grid-template-columns: 1fr; }}
+            .cause-grid {{ grid-template-columns: 1fr; }}
+            .proposal-grid {{ grid-template-columns: 1fr; }}
+            .hero-title {{ font-size: 2.2rem; }}
             
-            .nav-menu {
+            .nav-menu {{
                 display: none;
                 flex-direction: column;
                 position: absolute;
@@ -732,26 +740,26 @@
                 padding: 20px;
                 border-bottom: 1px solid var(--border-glass);
                 gap: 15px;
-            }
-            .nav-menu.open {
+            }}
+            .nav-menu.open {{
                 display: flex;
-            }
-            .nav-toggle {
+            }}
+            .nav-toggle {{
                 display: block;
-            }
-            .nav-actions {
+            }}
+            .nav-actions {{
                 display: none;
-            }
-            .mobile-only {
+            }}
+            .mobile-only {{
                 display: block;
-            }
-        }
+            }}
+        }}
 
-        @media (max-width: 600px) {
-            .kpi-grid { grid-template-columns: 1fr; }
-            .hero-title { font-size: 1.85rem; }
-            .chart-canvas-container { min-height: 340px; }
-        }
+        @media (max-width: 600px) {{
+            .kpi-grid {{ grid-template-columns: 1fr; }}
+            .hero-title {{ font-size: 1.85rem; }}
+            .chart-canvas-container {{ min-height: 340px; }}
+        }}
     </style>
 </head>
 <body>
@@ -1154,623 +1162,93 @@
         // Mobile Hamburger Menu
         const navToggle = document.getElementById('navToggle');
         const navMenu = document.getElementById('navMenu');
-        navToggle.addEventListener('click', () => {
+        navToggle.addEventListener('click', () => {{
             navMenu.classList.toggle('open');
-        });
-        function closeMenu() {
+        }});
+        function closeMenu() {{
             navMenu.classList.remove('open');
-        }
+        }}
 
-        const sidoData = [
-  {
-    "region": "서울특별시",
-    "total_rate": 56.8,
-    "city_bus_rate": 66.7,
-    "vulnerable_rate": 22.6,
-    "disabled_rate": 4.13,
-    "elderly_rate": 18.5,
-    "fiscal_rate": 81.2,
-    "total_low": 5087,
-    "total_pop": 9386034
-  },
-  {
-    "region": "부산광역시",
-    "total_rate": 29.9,
-    "city_bus_rate": 36.4,
-    "vulnerable_rate": 27.3,
-    "disabled_rate": 5.19,
-    "elderly_rate": 22.1,
-    "fiscal_rate": 53.2,
-    "total_low": 923,
-    "total_pop": 359508
-  },
-  {
-    "region": "대구광역시",
-    "total_rate": 46.1,
-    "city_bus_rate": 46.5,
-    "vulnerable_rate": 25.1,
-    "disabled_rate": 5.49,
-    "elderly_rate": 19.6,
-    "fiscal_rate": 32.1,
-    "total_low": 728,
-    "total_pop": 2374960
-  },
-  {
-    "region": "인천광역시",
-    "total_rate": 18.6,
-    "city_bus_rate": 18.8,
-    "vulnerable_rate": 21.7,
-    "disabled_rate": 5.06,
-    "elderly_rate": 16.6,
-    "fiscal_rate": 59.6,
-    "total_low": 412,
-    "total_pop": 2997410
-  },
-  {
-    "region": "광주광역시",
-    "total_rate": 34.8,
-    "city_bus_rate": 37.7,
-    "vulnerable_rate": 20.9,
-    "disabled_rate": 4.46,
-    "elderly_rate": 16.4,
-    "fiscal_rate": 46.2,
-    "total_low": 394,
-    "total_pop": 391377
-  },
-  {
-    "region": "대전광역시",
-    "total_rate": 39.0,
-    "city_bus_rate": 39.7,
-    "vulnerable_rate": 21.9,
-    "disabled_rate": 4.95,
-    "elderly_rate": 17.0,
-    "fiscal_rate": 46.4,
-    "total_low": 412,
-    "total_pop": 1442216
-  },
-  {
-    "region": "울산광역시",
-    "total_rate": 13.8,
-    "city_bus_rate": 14.6,
-    "vulnerable_rate": 20.5,
-    "disabled_rate": 4.64,
-    "elderly_rate": 15.9,
-    "fiscal_rate": 56.6,
-    "total_low": 127,
-    "total_pop": 1103661
-  },
-  {
-    "region": "세종특별자치시",
-    "total_rate": 41.3,
-    "city_bus_rate": 46.4,
-    "vulnerable_rate": 14.3,
-    "disabled_rate": 3.34,
-    "elderly_rate": 11.0,
-    "fiscal_rate": 69.7,
-    "total_low": 123,
-    "total_pop": 386525
-  },
-  {
-    "region": "경기도",
-    "total_rate": 30.7,
-    "city_bus_rate": 32.1,
-    "vulnerable_rate": 19.9,
-    "disabled_rate": 4.28,
-    "elderly_rate": 15.6,
-    "fiscal_rate": 65.7,
-    "total_low": 4179,
-    "total_pop": 13630821
-  },
-  {
-    "region": "강원특별자치도",
-    "total_rate": 26.1,
-    "city_bus_rate": 41.9,
-    "vulnerable_rate": 30.6,
-    "disabled_rate": 6.57,
-    "elderly_rate": 24.0,
-    "fiscal_rate": 29.4,
-    "total_low": 219,
-    "total_pop": 1527807
-  },
-  {
-    "region": "충청북도",
-    "total_rate": 25.4,
-    "city_bus_rate": 33.3,
-    "vulnerable_rate": 26.9,
-    "disabled_rate": 6.08,
-    "elderly_rate": 20.8,
-    "fiscal_rate": 36.2,
-    "total_low": 221,
-    "total_pop": 1593469
-  },
-  {
-    "region": "충청남도",
-    "total_rate": 16.5,
-    "city_bus_rate": 21.7,
-    "vulnerable_rate": 27.6,
-    "disabled_rate": 6.28,
-    "elderly_rate": 21.3,
-    "fiscal_rate": 37.9,
-    "total_low": 198,
-    "total_pop": 2130119
-  },
-  {
-    "region": "전라북도",
-    "total_rate": 24.8,
-    "city_bus_rate": 30.5,
-    "vulnerable_rate": 31.5,
-    "disabled_rate": 7.41,
-    "elderly_rate": 24.1,
-    "fiscal_rate": 27.9,
-    "total_low": 263,
-    "total_pop": 1754757
-  },
-  {
-    "region": "전라남도",
-    "total_rate": 11.5,
-    "city_bus_rate": 20.3,
-    "vulnerable_rate": 33.7,
-    "disabled_rate": 7.55,
-    "elderly_rate": 26.1,
-    "fiscal_rate": 28.7,
-    "total_low": 150,
-    "total_pop": 1804217
-  },
-  {
-    "region": "경상북도",
-    "total_rate": 18.0,
-    "city_bus_rate": 22.7,
-    "vulnerable_rate": 31.7,
-    "disabled_rate": 6.97,
-    "elderly_rate": 24.7,
-    "fiscal_rate": 29.7,
-    "total_low": 278,
-    "total_pop": 2554324
-  },
-  {
-    "region": "경상남도",
-    "total_rate": 32.8,
-    "city_bus_rate": 37.9,
-    "vulnerable_rate": 26.4,
-    "disabled_rate": 5.79,
-    "elderly_rate": 20.6,
-    "fiscal_rate": 38.8,
-    "total_low": 692,
-    "total_pop": 3251158
-  },
-  {
-    "region": "제주특별자치도",
-    "total_rate": 18.3,
-    "city_bus_rate": 18.9,
-    "vulnerable_rate": 23.4,
-    "disabled_rate": 5.46,
-    "elderly_rate": 17.9,
-    "fiscal_rate": 36.9,
-    "total_low": 159,
-    "total_pop": 675252
-  }
-];
-        const ggData = [
-  {
-    "city": "가평군",
-    "total_routes": 58,
-    "low_floor_routes": 0,
-    "low_floor_route_ratio": 0.0,
-    "vulnerable_rate": 38.2,
-    "disabled_rate": 8.13,
-    "elderly_rate": 30.0,
-    "fiscal_rate": 20.6,
-    "total_pop": 62302
-  },
-  {
-    "city": "고양시",
-    "total_routes": 569,
-    "low_floor_routes": 203,
-    "low_floor_route_ratio": 35.7,
-    "vulnerable_rate": 20.0,
-    "disabled_rate": 3.92,
-    "elderly_rate": 16.1,
-    "fiscal_rate": 35.1,
-    "total_pop": 1074907
-  },
-  {
-    "city": "과천시",
-    "total_routes": 40,
-    "low_floor_routes": 20,
-    "low_floor_route_ratio": 50.0,
-    "vulnerable_rate": 17.3,
-    "disabled_rate": 2.81,
-    "elderly_rate": 14.5,
-    "fiscal_rate": 49.2,
-    "total_pop": 81000
-  },
-  {
-    "city": "광명시",
-    "total_routes": 51,
-    "low_floor_routes": 32,
-    "low_floor_route_ratio": 62.7,
-    "vulnerable_rate": 21.1,
-    "disabled_rate": 4.39,
-    "elderly_rate": 16.7,
-    "fiscal_rate": 39.0,
-    "total_pop": 280197
-  },
-  {
-    "city": "광주시",
-    "total_routes": 360,
-    "low_floor_routes": 27,
-    "low_floor_route_ratio": 7.5,
-    "vulnerable_rate": 20.8,
-    "disabled_rate": 4.46,
-    "elderly_rate": 16.4,
-    "fiscal_rate": 38.0,
-    "total_pop": 391377
-  },
-  {
-    "city": "구리시",
-    "total_routes": 207,
-    "low_floor_routes": 38,
-    "low_floor_route_ratio": 18.4,
-    "vulnerable_rate": 21.1,
-    "disabled_rate": 4.55,
-    "elderly_rate": 16.6,
-    "fiscal_rate": 32.5,
-    "total_pop": 187093
-  },
-  {
-    "city": "군포시",
-    "total_routes": 86,
-    "low_floor_routes": 45,
-    "low_floor_route_ratio": 52.3,
-    "vulnerable_rate": 21.1,
-    "disabled_rate": 4.46,
-    "elderly_rate": 16.7,
-    "fiscal_rate": 33.9,
-    "total_pop": 261229
-  },
-  {
-    "city": "김포시",
-    "total_routes": 116,
-    "low_floor_routes": 15,
-    "low_floor_route_ratio": 12.9,
-    "vulnerable_rate": 18.6,
-    "disabled_rate": 3.84,
-    "elderly_rate": 14.7,
-    "fiscal_rate": 39.3,
-    "total_pop": 486172
-  },
-  {
-    "city": "남양주시",
-    "total_routes": 528,
-    "low_floor_routes": 86,
-    "low_floor_route_ratio": 16.3,
-    "vulnerable_rate": 21.2,
-    "disabled_rate": 4.51,
-    "elderly_rate": 16.7,
-    "fiscal_rate": 31.6,
-    "total_pop": 732265
-  },
-  {
-    "city": "동두천시",
-    "total_routes": 141,
-    "low_floor_routes": 7,
-    "low_floor_route_ratio": 5.0,
-    "vulnerable_rate": 31.2,
-    "disabled_rate": 7.09,
-    "elderly_rate": 24.1,
-    "fiscal_rate": 14.7,
-    "total_pop": 88626
-  },
-  {
-    "city": "부천시",
-    "total_routes": 188,
-    "low_floor_routes": 112,
-    "low_floor_route_ratio": 59.6,
-    "vulnerable_rate": 22.0,
-    "disabled_rate": 4.78,
-    "elderly_rate": 17.2,
-    "fiscal_rate": 33.0,
-    "total_pop": 779968
-  },
-  {
-    "city": "성남시",
-    "total_routes": 112,
-    "low_floor_routes": 18,
-    "low_floor_route_ratio": 16.1,
-    "vulnerable_rate": 20.5,
-    "disabled_rate": 3.89,
-    "elderly_rate": 16.6,
-    "fiscal_rate": 61.5,
-    "total_pop": 919747
-  },
-  {
-    "city": "수원시",
-    "total_routes": 241,
-    "low_floor_routes": 127,
-    "low_floor_route_ratio": 52.7,
-    "vulnerable_rate": 16.8,
-    "disabled_rate": 3.7,
-    "elderly_rate": 13.1,
-    "fiscal_rate": 49.2,
-    "total_pop": 1197257
-  },
-  {
-    "city": "시흥시",
-    "total_routes": 120,
-    "low_floor_routes": 5,
-    "low_floor_route_ratio": 4.2,
-    "vulnerable_rate": 15.8,
-    "disabled_rate": 4.3,
-    "elderly_rate": 11.5,
-    "fiscal_rate": 40.6,
-    "total_pop": 519715
-  },
-  {
-    "city": "안산시",
-    "total_routes": 219,
-    "low_floor_routes": 27,
-    "low_floor_route_ratio": 12.3,
-    "vulnerable_rate": 19.1,
-    "disabled_rate": 5.24,
-    "elderly_rate": 13.9,
-    "fiscal_rate": 38.2,
-    "total_pop": 629308
-  },
-  {
-    "city": "안성시",
-    "total_routes": 154,
-    "low_floor_routes": 80,
-    "low_floor_route_ratio": 51.9,
-    "vulnerable_rate": 26.1,
-    "disabled_rate": 5.9,
-    "elderly_rate": 20.2,
-    "fiscal_rate": 31.2,
-    "total_pop": 189034
-  },
-  {
-    "city": "안양시",
-    "total_routes": 234,
-    "low_floor_routes": 66,
-    "low_floor_route_ratio": 28.2,
-    "vulnerable_rate": 20.4,
-    "disabled_rate": 3.92,
-    "elderly_rate": 16.5,
-    "fiscal_rate": 43.3,
-    "total_pop": 544660
-  },
-  {
-    "city": "양주시",
-    "total_routes": 80,
-    "low_floor_routes": 7,
-    "low_floor_route_ratio": 8.8,
-    "vulnerable_rate": 22.3,
-    "disabled_rate": 5.09,
-    "elderly_rate": 17.2,
-    "fiscal_rate": 28.1,
-    "total_pop": 268026
-  },
-  {
-    "city": "양평군",
-    "total_routes": 470,
-    "low_floor_routes": 72,
-    "low_floor_route_ratio": 15.3,
-    "vulnerable_rate": 36.0,
-    "disabled_rate": 6.55,
-    "elderly_rate": 29.4,
-    "fiscal_rate": 21.1,
-    "total_pop": 125238
-  },
-  {
-    "city": "여주시",
-    "total_routes": 2,
-    "low_floor_routes": 0,
-    "low_floor_route_ratio": 0.0,
-    "vulnerable_rate": 31.8,
-    "disabled_rate": 6.56,
-    "elderly_rate": 25.3,
-    "fiscal_rate": 24.6,
-    "total_pop": 114412
-  },
-  {
-    "city": "연천군",
-    "total_routes": 81,
-    "low_floor_routes": 0,
-    "low_floor_route_ratio": 0.0,
-    "vulnerable_rate": 39.2,
-    "disabled_rate": 8.21,
-    "elderly_rate": 31.0,
-    "fiscal_rate": 19.6,
-    "total_pop": 41584
-  },
-  {
-    "city": "오산시",
-    "total_routes": 93,
-    "low_floor_routes": 25,
-    "low_floor_route_ratio": 26.9,
-    "vulnerable_rate": 15.7,
-    "disabled_rate": 3.93,
-    "elderly_rate": 11.7,
-    "fiscal_rate": 34.8,
-    "total_pop": 229656
-  },
-  {
-    "city": "용인시",
-    "total_routes": 256,
-    "low_floor_routes": 8,
-    "low_floor_route_ratio": 3.1,
-    "vulnerable_rate": 18.9,
-    "disabled_rate": 3.47,
-    "elderly_rate": 15.4,
-    "fiscal_rate": 53.3,
-    "total_pop": 1075566
-  },
-  {
-    "city": "의왕시",
-    "total_routes": 43,
-    "low_floor_routes": 22,
-    "low_floor_route_ratio": 51.2,
-    "vulnerable_rate": 20.8,
-    "disabled_rate": 4.1,
-    "elderly_rate": 16.7,
-    "fiscal_rate": 38.0,
-    "total_pop": 158870
-  },
-  {
-    "city": "의정부시",
-    "total_routes": 129,
-    "low_floor_routes": 24,
-    "low_floor_route_ratio": 18.6,
-    "vulnerable_rate": 22.5,
-    "disabled_rate": 4.83,
-    "elderly_rate": 17.7,
-    "fiscal_rate": 25.3,
-    "total_pop": 464213
-  },
-  {
-    "city": "이천시",
-    "total_routes": 561,
-    "low_floor_routes": 157,
-    "low_floor_route_ratio": 28.0,
-    "vulnerable_rate": 21.5,
-    "disabled_rate": 4.88,
-    "elderly_rate": 16.6,
-    "fiscal_rate": 52.4,
-    "total_pop": 222098
-  },
-  {
-    "city": "파주시",
-    "total_routes": 193,
-    "low_floor_routes": 64,
-    "low_floor_route_ratio": 33.2,
-    "vulnerable_rate": 20.2,
-    "disabled_rate": 4.52,
-    "elderly_rate": 15.7,
-    "fiscal_rate": 36.3,
-    "total_pop": 497753
-  },
-  {
-    "city": "평택시",
-    "total_routes": 466,
-    "low_floor_routes": 131,
-    "low_floor_route_ratio": 28.1,
-    "vulnerable_rate": 17.5,
-    "disabled_rate": 4.38,
-    "elderly_rate": 13.2,
-    "fiscal_rate": 46.5,
-    "total_pop": 591022
-  },
-  {
-    "city": "포천시",
-    "total_routes": 136,
-    "low_floor_routes": 16,
-    "low_floor_route_ratio": 11.8,
-    "vulnerable_rate": 31.4,
-    "disabled_rate": 7.11,
-    "elderly_rate": 24.3,
-    "fiscal_rate": 25.8,
-    "total_pop": 143323
-  },
-  {
-    "city": "하남시",
-    "total_routes": 72,
-    "low_floor_routes": 46,
-    "low_floor_route_ratio": 63.9,
-    "vulnerable_rate": 18.1,
-    "disabled_rate": 3.62,
-    "elderly_rate": 14.4,
-    "fiscal_rate": 52.0,
-    "total_pop": 329861
-  },
-  {
-    "city": "화성시",
-    "total_routes": 425,
-    "low_floor_routes": 130,
-    "low_floor_route_ratio": 30.6,
-    "vulnerable_rate": 13.7,
-    "disabled_rate": 3.36,
-    "elderly_rate": 10.3,
-    "fiscal_rate": 61.1,
-    "total_pop": 944342
-  }
-];
+        const sidoData = {sido_json};
+        const ggData = {gg_json};
 
         // Render Sido Table
         const sortedSido = [...sidoData].sort((a, b) => b.total_rate - a.total_rate);
         const tbodySido = document.getElementById('sidoTableBody');
-        sortedSido.forEach(d => {
+        sortedSido.forEach(d => {{
             const tr = document.createElement('tr');
             const badge = d.total_rate < 20 ? '<span class="badge-danger">취약 지역</span>' : (d.total_rate > 40 ? '<span class="badge-success">우수 도입</span>' : '-');
             tr.innerHTML = `
-                <td class="sticky-col"><strong>${d.region}</strong></td>
-                <td><strong>${d.total_rate}%</strong></td>
-                <td>${d.city_bus_rate}%</td>
-                <td>${d.vulnerable_rate}%</td>
-                <td>${d.elderly_rate}%</td>
-                <td>${d.disabled_rate}%</td>
-                <td>${d.fiscal_rate}%</td>
-                <td>${badge}</td>
+                <td class="sticky-col"><strong>${{d.region}}</strong></td>
+                <td><strong>${{d.total_rate}}%</strong></td>
+                <td>${{d.city_bus_rate}}%</td>
+                <td>${{d.vulnerable_rate}}%</td>
+                <td>${{d.elderly_rate}}%</td>
+                <td>${{d.disabled_rate}}%</td>
+                <td>${{d.fiscal_rate}}%</td>
+                <td>${{badge}}</td>
             `;
             tbodySido.appendChild(tr);
-        });
+        }});
 
         // Render Gyeonggi Table
         const medVul = 20.8;
         const medSup = 18.6;
         const sortedGG = [...ggData].sort((a, b) => b.low_floor_route_ratio - a.low_floor_route_ratio);
         const tbodyGG = document.getElementById('ggTableBody');
-        sortedGG.forEach(d => {
+        sortedGG.forEach(d => {{
             const tr = document.createElement('tr');
             let quadBadge = '<span style="color:#94a3b8;">일반</span>';
-            if (d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup) {
+            if (d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup) {{
                 quadBadge = '<span class="badge-danger">제1우선 소외지</span>';
-            } else if (d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup) {
+            }} else if (d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup) {{
                 quadBadge = '<span class="badge-success">자원 집중지</span>';
-            }
+            }}
             tr.innerHTML = `
-                <td class="sticky-col"><strong>${d.city}</strong></td>
-                <td><strong>${d.low_floor_route_ratio}%</strong></td>
-                <td>${d.low_floor_routes} / ${d.total_routes}개</td>
-                <td>${d.vulnerable_rate}%</td>
-                <td>${d.elderly_rate}%</td>
-                <td>${d.disabled_rate}%</td>
-                <td>${d.fiscal_rate}%</td>
-                <td>${quadBadge}</td>
+                <td class="sticky-col"><strong>${{d.city}}</strong></td>
+                <td><strong>${{d.low_floor_route_ratio}}%</strong></td>
+                <td>${{d.low_floor_routes}} / ${{d.total_routes}}개</td>
+                <td>${{d.vulnerable_rate}}%</td>
+                <td>${{d.elderly_rate}}%</td>
+                <td>${{d.disabled_rate}}%</td>
+                <td>${{d.fiscal_rate}}%</td>
+                <td>${{quadBadge}}</td>
             `;
             tbodyGG.appendChild(tr);
-        });
+        }});
 
         // Chart.js Rendering with try-catch fallback
-        try {
-            if (typeof Chart !== 'undefined') {
+        try {{
+            if (typeof Chart !== 'undefined') {{
                 // 1. 전국 17개 시도 산점도 (Scatter Chart with Trendline)
                 const ctxSido = document.getElementById('sidoScatterChart').getContext('2d');
                 
                 // Polyfit trendline points (x from 14 to 34)
                 // y = -1.0664 * x + 58.07
                 const trendPoints = [
-                    { x: 14.0, y: 47.0 },
-                    { x: 34.0, y: 25.7 }
+                    {{ x: 14.0, y: 47.0 }},
+                    {{ x: 34.0, y: 25.7 }}
                 ];
 
-                new Chart(ctxSido, {
+                new Chart(ctxSido, {{
                     type: 'scatter',
-                    data: {
+                    data: {{
                         datasets: [
-                            {
+                            {{
                                 label: '17개 시·도 지자체',
-                                data: sidoData.map(d => ({
+                                data: sidoData.map(d => ({{
                                     x: d.vulnerable_rate,
                                     y: d.total_rate,
                                     region: d.region,
                                     fiscal: d.fiscal_rate,
                                     cityBusRate: d.city_bus_rate
-                                })),
+                                }})),
                                 backgroundColor: sidoData.map(d => d.total_rate < 20 ? 'rgba(239, 68, 68, 0.85)' : 'rgba(59, 130, 246, 0.8)'),
                                 borderColor: '#ffffff',
                                 borderWidth: 1,
                                 pointRadius: sidoData.map(d => Math.max(5, d.fiscal_rate / 9))
-                            },
-                            {
+                            }},
+                            {{
                                 label: '음(-)의 추세선 (r = -0.435)',
                                 type: 'line',
                                 data: trendPoints,
@@ -1779,58 +1257,58 @@
                                 borderDash: [6, 4],
                                 fill: false,
                                 pointRadius: 0
-                            }
+                            }}
                         ]
-                    },
-                    options: {
+                    }},
+                    options: {{
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
+                        plugins: {{
+                            legend: {{ display: false }},
+                            tooltip: {{
+                                callbacks: {{
+                                    label: function(context) {{
                                         const raw = context.raw;
                                         if (!raw.region) return '추세선';
                                         return [
-                                            `[${raw.region}]`,
-                                            `교통약자 비율: ${raw.x}%`,
-                                            `저상버스 도입률: ${raw.y}% (시내버스 ${raw.cityBusRate}%)`,
-                                            `재정자립도: ${raw.fiscal}%`
+                                            `[${{raw.region}}]`,
+                                            `교통약자 비율: ${{raw.x}}%`,
+                                            `저상버스 도입률: ${{raw.y}}% (시내버스 ${{raw.cityBusRate}}%)`,
+                                            `재정자립도: ${{raw.fiscal}}%`
                                         ];
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: { display: true, text: '교통약자(고령자+등록장애인) 인구 비율 (%)', color: '#94a3b8' },
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8' },
+                                    }}
+                                }}
+                            }}
+                        }},
+                        scales: {{
+                            x: {{
+                                title: {{ display: true, text: '교통약자(고령자+등록장애인) 인구 비율 (%)', color: '#94a3b8' }},
+                                grid: {{ color: 'rgba(255, 255, 255, 0.05)' }},
+                                ticks: {{ color: '#94a3b8' }},
                                 min: 12,
                                 max: 36
-                            },
-                            y: {
-                                title: { display: true, text: '저상버스 도입률 (%)', color: '#94a3b8' },
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8' },
+                            }},
+                            y: {{
+                                title: {{ display: true, text: '저상버스 도입률 (%)', color: '#94a3b8' }},
+                                grid: {{ color: 'rgba(255, 255, 255, 0.05)' }},
+                                ticks: {{ color: '#94a3b8' }},
                                 min: 5,
                                 max: 65
-                            }
-                        }
-                    }
-                });
+                            }}
+                        }}
+                    }}
+                }});
 
                 // 2. 경기도 31개 시·군 4분면 버블 차트 (with city name labels)
                 const ctxGG = document.getElementById('ggQuadrantChart').getContext('2d');
 
-                new Chart(ctxGG, {
+                new Chart(ctxGG, {{
                     type: 'bubble',
-                    data: {
+                    data: {{
                         datasets: [
-                            {
+                            {{
                                 label: '제1우선 소외구역 (수요 高, 공급 低)',
-                                data: ggData.filter(d => d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup).map(d => ({
+                                data: ggData.filter(d => d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup).map(d => ({{
                                     x: d.vulnerable_rate,
                                     y: d.low_floor_route_ratio,
                                     r: Math.max(5, d.fiscal_rate / 3.8),
@@ -1838,14 +1316,14 @@
                                     fiscal: d.fiscal_rate,
                                     routes: d.total_routes,
                                     lowRoutes: d.low_floor_routes
-                                })),
+                                }})),
                                 backgroundColor: 'rgba(239, 68, 68, 0.85)',
                                 borderColor: '#ffffff',
                                 borderWidth: 1.2
-                            },
-                            {
+                            }},
+                            {{
                                 label: '자원 집중구역 (수요 低, 공급 高)',
-                                data: ggData.filter(d => d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup).map(d => ({
+                                data: ggData.filter(d => d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup).map(d => ({{
                                     x: d.vulnerable_rate,
                                     y: d.low_floor_route_ratio,
                                     r: Math.max(5, d.fiscal_rate / 3.8),
@@ -1853,14 +1331,14 @@
                                     fiscal: d.fiscal_rate,
                                     routes: d.total_routes,
                                     lowRoutes: d.low_floor_routes
-                                })),
+                                }})),
                                 backgroundColor: 'rgba(59, 130, 246, 0.85)',
                                 borderColor: '#ffffff',
                                 borderWidth: 1.2
-                            },
-                            {
+                            }},
+                            {{
                                 label: '일반 구역',
-                                data: ggData.filter(d => !(d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup) && !(d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup)).map(d => ({
+                                data: ggData.filter(d => !(d.vulnerable_rate > medVul && d.low_floor_route_ratio < medSup) && !(d.vulnerable_rate <= medVul && d.low_floor_route_ratio >= medSup)).map(d => ({{
                                     x: d.vulnerable_rate,
                                     y: d.low_floor_route_ratio,
                                     r: Math.max(5, d.fiscal_rate / 3.8),
@@ -1868,59 +1346,65 @@
                                     fiscal: d.fiscal_rate,
                                     routes: d.total_routes,
                                     lowRoutes: d.low_floor_routes
-                                })),
+                                }})),
                                 backgroundColor: 'rgba(148, 163, 184, 0.65)',
                                 borderColor: 'rgba(255, 255, 255, 0.4)',
                                 borderWidth: 1
-                            }
+                            }}
                         ]
-                    },
-                    options: {
+                    }},
+                    options: {{
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    title: function(context) {
+                        plugins: {{
+                            legend: {{ display: false }},
+                            tooltip: {{
+                                callbacks: {{
+                                    title: function(context) {{
                                         return context[0].raw.city;
-                                    },
-                                    label: function(context) {
+                                    }},
+                                    label: function(context) {{
                                         const raw = context.raw;
                                         return [
-                                            `[${raw.city}]`,
-                                            `교통약자 비율: ${raw.x}%`,
-                                            `저상버스 운행노선: ${raw.y}% (${raw.lowRoutes}/${raw.routes}개)`,
-                                            `재정자립도: ${raw.fiscal}%`
+                                            `[${{raw.city}}]`,
+                                            `교통약자 비율: ${{raw.x}}%`,
+                                            `저상버스 운행노선: ${{raw.y}}% (${{raw.lowRoutes}}/${{raw.routes}}개)`,
+                                            `재정자립도: ${{raw.fiscal}}%`
                                         ];
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: { display: true, text: '교통약자 인구 비율 (%) → [수요]', color: '#94a3b8' },
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8' },
+                                    }}
+                                }}
+                            }}
+                        }},
+                        scales: {{
+                            x: {{
+                                title: {{ display: true, text: '교통약자 인구 비율 (%) → [수요]', color: '#94a3b8' }},
+                                grid: {{ color: 'rgba(255, 255, 255, 0.05)' }},
+                                ticks: {{ color: '#94a3b8' }},
                                 min: 12,
                                 max: 42
-                            },
-                            y: {
-                                title: { display: true, text: '저상버스 운행 노선 비율 (%) → [공급]', color: '#94a3b8' },
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8' },
+                            }},
+                            y: {{
+                                title: {{ display: true, text: '저상버스 운행 노선 비율 (%) → [공급]', color: '#94a3b8' }},
+                                grid: {{ color: 'rgba(255, 255, 255, 0.05)' }},
+                                ticks: {{ color: '#94a3b8' }},
                                 min: -3,
                                 max: 70
-                            }
-                        }
-                    }
-                });
-            }
-        } catch(e) {
+                            }}
+                        }}
+                    }}
+                }});
+            }}
+        }} catch(e) {{
             console.error("Chart load error:", e);
             document.getElementById('sidoFallback').style.display = 'block';
             document.getElementById('ggFallback').style.display = 'block';
-        }
+        }}
     </script>
 </body>
 </html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("Properly formatted index.html written!")

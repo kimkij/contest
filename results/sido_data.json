@@ -1,0 +1,189 @@
+[
+  {
+    "region": "서울특별시",
+    "total_rate": 56.8,
+    "city_bus_rate": 66.7,
+    "vulnerable_rate": 22.6,
+    "disabled_rate": 4.13,
+    "elderly_rate": 18.5,
+    "fiscal_rate": 81.2,
+    "total_low": 5087,
+    "total_pop": 9386034
+  },
+  {
+    "region": "부산광역시",
+    "total_rate": 29.9,
+    "city_bus_rate": 36.4,
+    "vulnerable_rate": 27.3,
+    "disabled_rate": 5.19,
+    "elderly_rate": 22.1,
+    "fiscal_rate": 53.2,
+    "total_low": 923,
+    "total_pop": 359508
+  },
+  {
+    "region": "대구광역시",
+    "total_rate": 46.1,
+    "city_bus_rate": 46.5,
+    "vulnerable_rate": 25.1,
+    "disabled_rate": 5.49,
+    "elderly_rate": 19.6,
+    "fiscal_rate": 32.1,
+    "total_low": 728,
+    "total_pop": 2374960
+  },
+  {
+    "region": "인천광역시",
+    "total_rate": 18.6,
+    "city_bus_rate": 18.8,
+    "vulnerable_rate": 21.7,
+    "disabled_rate": 5.06,
+    "elderly_rate": 16.6,
+    "fiscal_rate": 59.6,
+    "total_low": 412,
+    "total_pop": 2997410
+  },
+  {
+    "region": "광주광역시",
+    "total_rate": 34.8,
+    "city_bus_rate": 37.7,
+    "vulnerable_rate": 20.9,
+    "disabled_rate": 4.46,
+    "elderly_rate": 16.4,
+    "fiscal_rate": 46.2,
+    "total_low": 394,
+    "total_pop": 391377
+  },
+  {
+    "region": "대전광역시",
+    "total_rate": 39.0,
+    "city_bus_rate": 39.7,
+    "vulnerable_rate": 21.9,
+    "disabled_rate": 4.95,
+    "elderly_rate": 17.0,
+    "fiscal_rate": 46.4,
+    "total_low": 412,
+    "total_pop": 1442216
+  },
+  {
+    "region": "울산광역시",
+    "total_rate": 13.8,
+    "city_bus_rate": 14.6,
+    "vulnerable_rate": 20.5,
+    "disabled_rate": 4.64,
+    "elderly_rate": 15.9,
+    "fiscal_rate": 56.6,
+    "total_low": 127,
+    "total_pop": 1103661
+  },
+  {
+    "region": "세종특별자치시",
+    "total_rate": 41.3,
+    "city_bus_rate": 46.4,
+    "vulnerable_rate": 14.3,
+    "disabled_rate": 3.34,
+    "elderly_rate": 11.0,
+    "fiscal_rate": 69.7,
+    "total_low": 123,
+    "total_pop": 386525
+  },
+  {
+    "region": "경기도",
+    "total_rate": 30.7,
+    "city_bus_rate": 32.1,
+    "vulnerable_rate": 19.9,
+    "disabled_rate": 4.28,
+    "elderly_rate": 15.6,
+    "fiscal_rate": 65.7,
+    "total_low": 4179,
+    "total_pop": 13630821
+  },
+  {
+    "region": "강원특별자치도",
+    "total_rate": 26.1,
+    "city_bus_rate": 41.9,
+    "vulnerable_rate": 30.6,
+    "disabled_rate": 6.57,
+    "elderly_rate": 24.0,
+    "fiscal_rate": 29.4,
+    "total_low": 219,
+    "total_pop": 1527807
+  },
+  {
+    "region": "충청북도",
+    "total_rate": 25.4,
+    "city_bus_rate": 33.3,
+    "vulnerable_rate": 26.9,
+    "disabled_rate": 6.08,
+    "elderly_rate": 20.8,
+    "fiscal_rate": 36.2,
+    "total_low": 221,
+    "total_pop": 1593469
+  },
+  {
+    "region": "충청남도",
+    "total_rate": 16.5,
+    "city_bus_rate": 21.7,
+    "vulnerable_rate": 27.6,
+    "disabled_rate": 6.28,
+    "elderly_rate": 21.3,
+    "fiscal_rate": 37.9,
+    "total_low": 198,
+    "total_pop": 2130119
+  },
+  {
+    "region": "전라북도",
+    "total_rate": 24.8,
+    "city_bus_rate": 30.5,
+    "vulnerable_rate": 31.5,
+    "disabled_rate": 7.41,
+    "elderly_rate": 24.1,
+    "fiscal_rate": 27.9,
+    "total_low": 263,
+    "total_pop": 1754757
+  },
+  {
+    "region": "전라남도",
+    "total_rate": 11.5,
+    "city_bus_rate": 20.3,
+    "vulnerable_rate": 33.7,
+    "disabled_rate": 7.55,
+    "elderly_rate": 26.1,
+    "fiscal_rate": 28.7,
+    "total_low": 150,
+    "total_pop": 1804217
+  },
+  {
+    "region": "경상북도",
+    "total_rate": 18.0,
+    "city_bus_rate": 22.7,
+    "vulnerable_rate": 31.7,
+    "disabled_rate": 6.97,
+    "elderly_rate": 24.7,
+    "fiscal_rate": 29.7,
+    "total_low": 278,
+    "total_pop": 2554324
+  },
+  {
+    "region": "경상남도",
+    "total_rate": 32.8,
+    "city_bus_rate": 37.9,
+    "vulnerable_rate": 26.4,
+    "disabled_rate": 5.79,
+    "elderly_rate": 20.6,
+    "fiscal_rate": 38.8,
+    "total_low": 692,
+    "total_pop": 3251158
+  },
+  {
+    "region": "제주특별자치도",
+    "total_rate": 18.3,
+    "city_bus_rate": 18.9,
+    "vulnerable_rate": 23.4,
+    "disabled_rate": 5.46,
+    "elderly_rate": 17.9,
+    "fiscal_rate": 36.9,
+    "total_low": 159,
+    "total_pop": 675252
+  }
+]

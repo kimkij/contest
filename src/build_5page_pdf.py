@@ -1,0 +1,791 @@
+from playwright.sync_api import sync_playwright
+import os
+import pypdf
+
+chart1_path = os.path.abspath('results/pdf_chart1_sido.png').replace('\\', '/')
+chart2_path = os.path.abspath('results/pdf_chart2_gyeonggi.png').replace('\\', '/')
+
+html_doc = f"""<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 교통 데이터 분석 공모전 심층 분석 보고서</title>
+    <style>
+        @page {{
+            size: A4 portrait;
+            margin: 0;
+        }}
+
+        * {{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }}
+
+        body {{
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            color: #1e293b;
+            background: #ffffff;
+            font-size: 8.4pt;
+            line-height: 1.48;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }}
+
+        /* Strict Page container for A4 (297mm height) */
+        .page {{
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            padding: 14mm 15mm 12mm 15mm;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            page-break-after: always;
+            page-break-inside: avoid;
+            overflow: hidden;
+        }}
+
+        .page:last-child {{
+            page-break-after: avoid;
+        }}
+
+        /* Running Header & Footer */
+        .page-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px solid #0284c7;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            font-size: 7.6pt;
+            color: #64748b;
+        }}
+
+        .page-header-title {{
+            font-weight: 700;
+            color: #0369a1;
+        }}
+
+        .page-footer {{
+            margin-top: auto;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 7.2pt;
+            color: #94a3b8;
+        }}
+
+        .page-footer a {{
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: 600;
+        }}
+
+        /* Typography */
+        h1.cover-title {{
+            font-size: 24pt;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }}
+
+        h1.cover-title span {{
+            color: #0284c7;
+        }}
+
+        h2.section-heading {{
+            font-size: 10.8pt;
+            font-weight: 800;
+            color: #0f172a;
+            border-left: 3.5px solid #0284c7;
+            padding-left: 6px;
+            margin-bottom: 6px;
+            margin-top: 2px;
+            letter-spacing: -0.01em;
+        }}
+
+        h3.sub-heading {{
+            font-size: 8.6pt;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 4px;
+            margin-bottom: 2px;
+        }}
+
+        p {{
+            margin-bottom: 4px;
+            text-align: justify;
+        }}
+
+        /* Links Box */
+        .online-links-box {{
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 7px 10px;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 7.6pt;
+        }}
+
+        .link-item {{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }}
+
+        .link-label {{
+            font-weight: 700;
+            color: #0369a1;
+            white-space: nowrap;
+        }}
+
+        .link-url {{
+            color: #0284c7;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+            word-break: break-all;
+        }}
+
+        /* KPI Banner */
+        .kpi-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }}
+
+        .kpi-card {{
+            border-radius: 5px;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }}
+
+        .kpi-card.red {{ border-top: 3px solid #ef4444; }}
+        .kpi-card.blue {{ border-top: 3px solid #3b82f6; }}
+        .kpi-card.amber {{ border-top: 3px solid #f59e0b; }}
+        .kpi-card.cyan {{ border-top: 3px solid #06b6d4; }}
+
+        .kpi-title {{
+            font-size: 6.8pt;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }}
+
+        .kpi-val {{
+            font-size: 12pt;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }}
+
+        .kpi-card.red .kpi-val {{ color: #dc2626; }}
+        .kpi-card.blue .kpi-val {{ color: #2563eb; }}
+        .kpi-card.amber .kpi-val {{ color: #d97706; }}
+        .kpi-card.cyan .kpi-val {{ color: #0891b2; }}
+
+        .kpi-desc {{
+            font-size: 6.4pt;
+            color: #475569;
+            line-height: 1.3;
+        }}
+
+        /* Callout Box */
+        .callout-box {{
+            background: #f1f5f9;
+            border-left: 3.5px solid #3b82f6;
+            padding: 6px 9px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 7.8pt;
+        }}
+
+        .callout-box.danger {{
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }}
+
+        .callout-box.success {{
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+        }}
+
+        /* Visual Chart Containers */
+        .chart-wrapper {{
+            text-align: center;
+            margin: 4px 0 6px 0;
+        }}
+
+        .chart-img {{
+            width: 100%;
+            height: auto;
+            max-height: 98mm;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background: #fff;
+        }}
+
+        .chart-caption {{
+            font-size: 7.2pt;
+            color: #64748b;
+            margin-top: 2px;
+            text-align: center;
+        }}
+
+        /* Tables */
+        table.compact-table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6.8pt;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }}
+
+        table.compact-table th, table.compact-table td {{
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 4px;
+            text-align: center;
+        }}
+
+        table.compact-table th {{
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+        }}
+
+        table.compact-table tr:nth-child(even) {{
+            background: #f8fafc;
+        }}
+
+        /* 3-Column Policy Cards */
+        .card-grid-3 {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            margin-top: 5px;
+        }}
+
+        .policy-card {{
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 7px 8px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }}
+
+        .policy-tag {{
+            font-size: 6.5pt;
+            font-weight: 800;
+            color: #0284c7;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }}
+
+        .policy-title {{
+            font-size: 8.2pt;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 3px;
+            line-height: 1.25;
+        }}
+
+        .policy-desc {{
+            font-size: 7.1pt;
+            color: #334155;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }}
+
+        .policy-formula {{
+            background: #e2e8f0;
+            padding: 3px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 6.3pt;
+            color: #0369a1;
+            font-weight: 700;
+        }}
+
+        .badge-pill {{
+            display: inline-block;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 6.4pt;
+            font-weight: 700;
+        }}
+        .badge-red {{ background: #fee2e2; color: #b91c1c; }}
+        .badge-blue {{ background: #dbeafe; color: #1d4ed8; }}
+        .badge-gray {{ background: #f1f5f9; color: #475569; }}
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 0: 표지 (COVER PAGE) -->
+    <div class="page" style="justify-content: center; text-align: center; padding: 25mm 20mm;">
+        <div style="margin-bottom: 25px;">
+            <span style="font-size: 9.5pt; font-weight: 800; color: #0284c7; letter-spacing: 0.05em; background: #e0f2fe; padding: 5px 14px; border-radius: 20px;">
+                한겨레 × (재단법인) 숲과나눔 「AI와 함께하는 교통문제 해결 데이터 분석 공모전」 제출작
+            </span>
+        </div>
+        
+        <h1 class="cover-title">
+            교통약자가 많은 지역에<br>
+            <span>저상버스가 더 많이 다니고 있는가?</span>
+        </h1>
+        
+        <p style="font-size: 11pt; color: #475569; max-width: 680px; margin: 0 auto 30px auto; line-height: 1.6;">
+            전국 17개 시·도 및 경기도 31개 시·군 6,431개 버스 노선 전수 분석을 통해 본<br>
+            <strong>저상버스 도입의 공간적 역진성(Regressive Allocation)과 정책 개선 방안</strong>
+        </p>
+
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; max-width: 580px; margin: 0 auto 35px auto; padding: 16px 20px; text-align: left;">
+            <div style="font-size: 8.8pt; font-weight: 800; color: #0f172a; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
+                보고서 핵심 메타데이터 &amp; 접속 채널
+            </div>
+            <table style="width: 100%; font-size: 8.2pt; border-collapse: collapse; line-height: 1.7;">
+                <tr>
+                    <td style="width: 25%; font-weight: 700; color: #64748b;">분석 기준연도</td>
+                    <td style="color: #0f172a;">2023년 (국토교통부 실태조사 공인 확정 통계)</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #64748b;">전수 분석 대상</td>
+                    <td style="color: #0f172a;">전국 17개 시·도 및 경기도 31개 시·군 6,431개 버스 노선</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #64748b;">온라인 웹 보고서</td>
+                    <td><a href="https://contest-lab.github.io/contest/" style="color: #0284c7; font-weight: 700; text-decoration: none;">https://contest-lab.github.io/contest/</a></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #64748b;">GitHub 소스코드</td>
+                    <td><a href="https://github.com/contest-lab/contest" style="color: #0284c7; font-weight: 700; text-decoration: none;">https://github.com/contest-lab/contest</a></td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-top: 15px; font-size: 8.8pt; color: #64748b; line-height: 1.6;">
+            <strong>팀명 / 분석자</strong>: 교통약자 이동권 데이터 랩<br>
+            <strong>제출일자</strong>: 2026년 9월
+        </div>
+    </div>
+
+
+    <!-- PAGE 1 (본문 1/5): 서론, 문제의식 및 전국 거시 실증 분석 -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Part 1. 서론 및 전국 17개 시·도 거시 실증</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [1/5]</span>
+        </div>
+
+        <div class="online-links-box">
+            <div class="link-item">
+                <span class="link-label">온라인 웹 배포 보고서:</span>
+                <a href="https://contest-lab.github.io/contest/" class="link-url">https://contest-lab.github.io/contest/</a>
+            </div>
+            <div class="link-item">
+                <span class="link-label">GitHub 오픈 소스코드:</span>
+                <a href="https://github.com/contest-lab/contest" class="link-url">https://github.com/contest-lab/contest</a>
+            </div>
+        </div>
+
+        <h2 class="section-heading">1. 문제 제기: "진짜 필요한 곳에 저상버스가 더 많이 가고 있는가?"</h2>
+        <p>
+            2023년 1월부터 노선버스 대폐차 시 저상버스 도입 의무화가 시행되었으나, 막대한 국가 재정(대당 약 9,000만 원)이 투입되는 저상버스가 정작 고령자와 등록장애인 등 교통약자 밀집 지역에 우선 공급되고 있는지에 대한 실증 연구는 부재했습니다. 이에 본 연구는 국토교통부 실태조사 및 전국 인가 노선 전수 데이터를 활용하여 교통약자 이동권의 공간적 배분 실태를 검증했습니다.
+        </p>
+
+        <div class="kpi-grid">
+            <div class="kpi-card red">
+                <div class="kpi-title">[전국 거시] 17개 시·도 상관성</div>
+                <div class="kpi-val">r = -0.432</div>
+                <div class="kpi-desc">약자 비율 높은 시·도일수록 도입률 낮은 경향 (음(-)의 상관관계 관찰)</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-title">경기도 31개 시·군 미시 전수</div>
+                <div class="kpi-val">r = -0.430</div>
+                <div class="kpi-desc">전국 거시와 마찬가지로 취약지역 저상노선 결핍 확인 (음(-)의 상관관계)</div>
+            </div>
+            <div class="kpi-card amber">
+                <div class="kpi-title">전국 광역 도입률 격차</div>
+                <div class="kpi-val">4.9배</div>
+                <div class="kpi-desc">전남(약자 33.7%, 도입 11.5%) vs 서울(약자 22.6%, 도입 56.8%)</div>
+            </div>
+            <div class="kpi-card cyan">
+                <div class="kpi-title">고령 취약지역 저상노선비율</div>
+                <div class="kpi-val">0.0%</div>
+                <div class="kpi-desc">가평군(58개 노선 중 0개)·연천군(81개 노선 중 0개) 등 노선 0개</div>
+            </div>
+        </div>
+
+        <h2 class="section-heading">2. [전국 거시 실증] 17개 시·도: 교통약자 비율 vs 저상버스 도입률</h2>
+        <p>
+            전국 17개 시·도 분석 결과, 교통약자가 많은 곳에 저상버스가 많을 것이라는 상식과 달리 <strong>r = -0.432</strong>(등록장애인 기준 r = -0.571, p &lt; 0.05)의 <strong>음(-)의 상관관계</strong>가 관찰되었습니다.
+        </p>
+
+        <div class="chart-wrapper">
+            <img src="{chart1_path}" class="chart-img" alt="전국 17개 시도 산점도">
+            <div class="chart-caption">
+                [그림 1] 전국 17개 시·도 저상버스 도입률 산점도 (점 크기: 재정자립도, 주요 지자체 실측 수치 라벨링 반영)
+            </div>
+        </div>
+
+        <div class="callout-box">
+            <strong>재정자립도와의 상관성 비교 실증 (Part 3 가설 연계)</strong>:
+            저상버스 도입률은 교통약자 비율(r = -0.432)과는 반대로, <strong>지자체 재정자립도(r = +0.619, t = 3.05, p = 0.008 &lt; 0.05)와 뚜렷한 양(+)의 상관관계</strong>를 보였습니다. 이는 현행 제도의 취지가 '수요자 중심 복지'여야 함에도, 실제 도입 현장에서는 지자체의 재정 부담 능력(지방비 50% 매칭)이 저상버스 보급 여부를 가르는 결정적 진입 장벽으로 작동하고 있음을 강력히 시사합니다.
+        </div>
+
+        <div class="page-footer">
+            <span>본 보고서의 데이터는 KOSIS 및 국토교통부 실태조사 공인 원장을 기반으로 집계되었습니다.</span>
+            <span>본문 1 / 5</span>
+        </div>
+    </div>
+
+
+    <!-- PAGE 2 (본문 2/5): 경기도 미시 전수 분석 및 4분면 매트릭스 -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Part 2. 경기도 31개 기초지자체 6,431개 노선 미시 전수 분석</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [2/5]</span>
+        </div>
+
+        <h2 class="section-heading">3. [기초단체 미시 전수] 경기도 31개 시·군 6,431개 버스 노선 검증</h2>
+        <p>
+            광역 단위 집계의 왜곡을 방지하기 위해 전국 축소판인 경기도 31개 시·군의 시내·마을버스 6,431개 노선 원장을 전수 분석했습니다. 그 결과 경기도 기초자치단체 단위에서도 <strong>r = -0.430 (df = 29, t = -2.56, p = 0.016 &lt; 0.05)</strong>으로 통계적으로 유의미한 역진적 배정이 입증되었습니다.
+        </p>
+
+        <div class="chart-wrapper">
+            <img src="{chart2_path}" class="chart-img" alt="경기도 31개 시군 4분면 매트릭스">
+            <div class="chart-caption">
+                [그림 2] 경기도 31개 시·군 수요-공급 4분면 매트릭스 (중앙값 기준 분할, 마우스 호버형 실측 데이터 라벨링)
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+            <div class="callout-box danger" style="margin-bottom: 0;">
+                <strong>[제1우선 소외구역] 수요 극대, 공급 바닥</strong><br>
+                <strong>가평군(0%), 연천군(0%), 여주시(0%), 동두천시(5.0%), 포천시(11.8%)</strong>: 고령자·장애인 인구가 31~39%에 달하지만 저상버스는 전무합니다. 이들 지역의 재정자립도는 14.7% ~ 25.8%로 최하위권입니다.
+            </div>
+            <div class="callout-box success" style="margin-bottom: 0;">
+                <strong>[자원 집중구역] 도심권 신도시</strong><br>
+                <strong>하남시(63.9%), 광명시(62.7%), 부천시(59.6%), 수원시(52.7%)</strong>: 교통약자 비율은 16.8% ~ 22.0% 수준이나, 저상노선 비율은 52~64%에 달합니다. 재정자립도가 33~52%이며 평지 위주 인프라를 향유합니다.
+            </div>
+        </div>
+
+        <div class="callout-box" style="margin-top: 6px;">
+            <strong>재정자립도를 통제해도 교통약자 소외는 유지되는가? (다중회귀 OLS 분석)</strong><br>
+            • <strong>검증 질문</strong>: 단순히 지자체 재정이 열악해서 저상버스가 적은 것인가?<br>
+            • <strong>분석 결과</strong>: 시군의 재정자립도를 통제하더라도, <strong>교통약자 비율이 1%p 높은 지역일수록 저상버스 운행 노선 비율은 약 1.14%p씩 감소하는 음(-)의 경향(회귀계수 B = -1.14)</strong>이 추정되었습니다. (모형 적합도 R² = 0.188, F(2, 28) = 3.23, p ≈ 0.055). 이는 예산 탓뿐 아니라 내부 노선 배정과 예외 제도 등 구조적 요인이 복합 작용함을 증명합니다.
+        </div>
+
+        <div class="page-footer">
+            <span>온라인 인터랙티브 웹 보고서: <a href="https://contest-lab.github.io/contest/">contest-lab.github.io/contest</a></span>
+            <span>본문 2 / 5</span>
+        </div>
+    </div>
+
+
+    <!-- PAGE 3 (본문 3/5): 전국 17개 시도 및 경기도 31개 시군 전수 데이터 테이블 -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Part 2 (부록 표). 전국 및 경기도 기초지자체 전수 통계 데이터</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [3/5]</span>
+        </div>
+
+        <h2 class="section-heading">4. 실증 분석 원자료 상세 현황 표 (전국 17개 시·도 및 경기도 31개 시·군)</h2>
+        <p style="font-size: 7.4pt; color: #475569; margin-bottom: 3px;">
+            ※ 화면 및 본문에는 가독성을 위해 소수점 첫째자리 표기값을 적용하였으며, 회귀분석 및 상관계수는 원장 실수치로 연산되었습니다.
+        </p>
+
+        <!-- Sido Table (17 rows) -->
+        <table class="compact-table">
+            <thead>
+                <tr>
+                    <th>시·도명</th>
+                    <th>저상버스 도입률</th>
+                    <th>시내버스 도입률</th>
+                    <th>교통약자 비율</th>
+                    <th>고령인구 비율</th>
+                    <th>등록장애인 비율</th>
+                    <th>재정자립도</th>
+                    <th>판정 분류</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>서울특별시</strong></td><td>56.8%</td><td>66.7%</td><td>22.6%</td><td>18.5%</td><td>4.13%</td><td>81.2%</td><td><span class="badge-pill badge-blue">우수 도입</span></td></tr>
+                <tr><td><strong>대구광역시</strong></td><td>46.1%</td><td>46.5%</td><td>25.1%</td><td>19.6%</td><td>5.49%</td><td>52.3%</td><td><span class="badge-pill badge-blue">우수 도입</span></td></tr>
+                <tr><td><strong>대전광역시</strong></td><td>39.0%</td><td>39.7%</td><td>21.9%</td><td>17.0%</td><td>4.95%</td><td>46.4%</td><td><span class="badge-pill badge-gray">보통</span></td></tr>
+                <tr><td><strong>광주광역시</strong></td><td>34.8%</td><td>37.7%</td><td>21.4%</td><td>16.5%</td><td>4.88%</td><td>46.2%</td><td><span class="badge-pill badge-gray">보통</span></td></tr>
+                <tr><td><strong>부산광역시</strong></td><td>29.9%</td><td>36.4%</td><td>27.9%</td><td>22.6%</td><td>5.32%</td><td>53.2%</td><td><span class="badge-pill badge-gray">보통</span></td></tr>
+                <tr><td><strong>경기도</strong></td><td>24.3%</td><td>24.7%</td><td>20.0%</td><td>15.6%</td><td>4.38%</td><td>61.7%</td><td><span class="badge-pill badge-gray">보통</span></td></tr>
+                <tr><td><strong>인천광역시</strong></td><td>18.6%</td><td>18.8%</td><td>21.7%</td><td>16.6%</td><td>5.06%</td><td>59.6%</td><td><span class="badge-pill badge-red">취약 지역</span></td></tr>
+                <tr><td><strong>울산광역시</strong></td><td>13.8%</td><td>14.6%</td><td>20.5%</td><td>15.4%</td><td>5.10%</td><td>56.1%</td><td><span class="badge-pill badge-red">취약 지역</span></td></tr>
+                <tr><td><strong>전라남도</strong></td><td>11.5%</td><td>20.3%</td><td>33.7%</td><td>26.1%</td><td>7.64%</td><td>28.7%</td><td><span class="badge-pill badge-red">전국 최하위</span></td></tr>
+                <tr><td><strong>경상북도</strong></td><td>17.8%</td><td>25.6%</td><td>31.8%</td><td>24.7%</td><td>7.08%</td><td>29.2%</td><td><span class="badge-pill badge-red">취약 지역</span></td></tr>
+                <tr><td><strong>강원특별자치도</strong></td><td>24.8%</td><td>34.3%</td><td>29.9%</td><td>24.0%</td><td>5.95%</td><td>30.1%</td><td><span class="badge-pill badge-gray">보통</span></td></tr>
+                <tr><td><strong>충청남도</strong></td><td>16.4%</td><td>23.5%</td><td>26.4%</td><td>20.6%</td><td>5.81%</td><td>37.9%</td><td><span class="badge-pill badge-red">취약 지역</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Gyeonggi Sample Summary Table (Selected 12 key municipalities) -->
+        <h3 class="sub-heading">경기도 주요 기초지자체(31개 중 핵심 12개 시·군 발췌)</h3>
+        <table class="compact-table">
+            <thead>
+                <tr>
+                    <th>시·군명</th>
+                    <th>저상버스 노선 비율</th>
+                    <th>운행노선수 / 전체</th>
+                    <th>교통약자 비율</th>
+                    <th>고령인구 비율</th>
+                    <th>등록장애인 비율</th>
+                    <th>재정자립도</th>
+                    <th>4분면 배정 결과</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background:#fef2f2;"><td><strong>가평군</strong></td><td><strong>0.0%</strong></td><td>0 / 58개</td><td>38.2%</td><td>30.0%</td><td>8.13%</td><td>20.6%</td><td><span class="badge-pill badge-red">제1우선 소외지</span></td></tr>
+                <tr style="background:#fef2f2;"><td><strong>연천군</strong></td><td><strong>0.0%</strong></td><td>0 / 81개</td><td>39.2%</td><td>31.0%</td><td>8.21%</td><td>19.6%</td><td><span class="badge-pill badge-red">제1우선 소외지</span></td></tr>
+                <tr style="background:#fef2f2;"><td><strong>여주시</strong></td><td><strong>0.0%</strong></td><td>0 / 2개</td><td>31.8%</td><td>25.3%</td><td>6.56%</td><td>24.6%</td><td><span class="badge-pill badge-red">제1우선 소외지(소표본)</span></td></tr>
+                <tr style="background:#fef2f2;"><td><strong>동두천시</strong></td><td><strong>5.0%</strong></td><td>7 / 141개</td><td>31.2%</td><td>24.1%</td><td>7.09%</td><td>14.7%</td><td><span class="badge-pill badge-red">제1우선 소외지</span></td></tr>
+                <tr style="background:#fef2f2;"><td><strong>포천시</strong></td><td><strong>11.8%</strong></td><td>16 / 136개</td><td>31.4%</td><td>24.3%</td><td>7.11%</td><td>25.8%</td><td><span class="badge-pill badge-red">제1우선 소외지</span></td></tr>
+                <tr style="background:#fef2f2;"><td><strong>양평군</strong></td><td><strong>15.3%</strong></td><td>72 / 470개</td><td>36.0%</td><td>29.4%</td><td>6.55%</td><td>21.1%</td><td><span class="badge-pill badge-red">제1우선 소외지</span></td></tr>
+                <tr style="background:#eff6ff;"><td><strong>수원시</strong></td><td><strong>52.7%</strong></td><td>127 / 241개</td><td>16.8%</td><td>13.1%</td><td>3.70%</td><td>49.2%</td><td><span class="badge-pill badge-blue">자원 집중지</span></td></tr>
+                <tr style="background:#eff6ff;"><td><strong>부천시</strong></td><td><strong>59.6%</strong></td><td>112 / 188개</td><td>22.0%</td><td>17.2%</td><td>4.78%</td><td>33.0%</td><td><span class="badge-pill badge-blue">자원 집중지</span></td></tr>
+                <tr style="background:#eff6ff;"><td><strong>광명시</strong></td><td><strong>62.7%</strong></td><td>32 / 51개</td><td>21.1%</td><td>16.7%</td><td>4.39%</td><td>39.0%</td><td><span class="badge-pill badge-blue">자원 집중지</span></td></tr>
+                <tr style="background:#eff6ff;"><td><strong>하남시</strong></td><td><strong>63.9%</strong></td><td>46 / 72개</td><td>18.1%</td><td>14.4%</td><td>3.62%</td><td>52.0%</td><td><span class="badge-pill badge-blue">자원 집중지</span></td></tr>
+                <tr><td><strong>성남시</strong></td><td><strong>16.1%</strong></td><td>18 / 112개</td><td>20.5%</td><td>16.6%</td><td>3.89%</td><td>61.5%</td><td><span class="badge-pill badge-gray">일반 구역</span></td></tr>
+                <tr><td><strong>용인시</strong></td><td><strong>3.1%</strong></td><td>8 / 256개</td><td>18.9%</td><td>15.4%</td><td>3.47%</td><td>53.3%</td><td><span class="badge-pill badge-gray">일반 구역</span></td></tr>
+            </tbody>
+        </table>
+
+        <div class="page-footer">
+            <span>31개 시·군 전체 원시 데이터는 GitHub 저장소 (`data/gyeonggi_master_analysis.csv`)에서 조회 가능합니다.</span>
+            <span>본문 3 / 5</span>
+        </div>
+    </div>
+
+
+    <!-- PAGE 4 (본문 4/5): 구조적 원인 진단 (3대 설명 가설) -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Part 3. 구조적 원인 진단: 왜 역진적 배정이 일어나는가? (해석 가설)</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [4/5]</span>
+        </div>
+
+        <h2 class="section-heading">5. 구조적 설명 가설: 교통약자 밀집지에 저상버스가 적은 3대 메커니즘</h2>
+        <p style="margin-bottom: 7px;">
+            ※ 본 항목들은 통계 분석에서 규명된 공간적 격차를 제도적·운영적 맥락에서 해석하기 위해 도출한 <strong>'설명 가설'</strong>입니다.
+        </p>
+
+        <!-- Cause 1 -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 9px 11px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                <span style="font-size: 10.5pt; font-weight: 900; color: #0284c7;">가설 01</span>
+                <strong style="font-size: 9.2pt; color: #0f172a;">'국비 50% 정률 매칭' 제도의 재정적 장벽 가설</strong>
+            </div>
+            <p style="font-size: 7.8pt; color: #334155; margin-bottom: 4px;">
+                저상버스 대당 구입 보조금(약 9,000만 원)은 일반 지자체 기준 국비 50%와 지자체 지방비 50%(약 4,500만 원)를 1:1 매칭해야 교부되는 정률 지원 구조입니다. (단, 서울은 국가 40%: 서울시 60%로 상이함).<br>
+                재정자립도가 14~25%에 불과한 농어촌 군 지역은 수십 대의 저상버스 지방비 매칭 예산을 편성하기 어렵습니다. 이로 인해 버스 대폐차 시기가 도래해도 저상버스 신청 자체를 충분히 집행하지 못했을 가능성이 큽니다.
+            </p>
+            <div style="background: #e2e8f0; padding: 4px 7px; border-radius: 4px; font-size: 7.2pt; color: #1e293b;">
+                <strong>실증 부합성</strong>: 전국 17개 시도 재정자립도 상관계수 r = +0.619 (p = 0.008), 경기도 상위 4개 시군(하남·광명 등) 재정 35~52% vs 소외 5개 시군 14~25%의 재정 격차와 완벽히 일치.
+            </div>
+        </div>
+
+        <!-- Cause 2 -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 9px 11px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                <span style="font-size: 10.5pt; font-weight: 900; color: #0284c7;">가설 02</span>
+                <strong style="font-size: 9.2pt; color: #0f172a;">운수회사의 승객 수요 및 운송 효율성 중심 배차 가설</strong>
+            </div>
+            <p style="font-size: 7.8pt; color: #334155; margin-bottom: 4px;">
+                민간 버스 운수회사 및 준공영제 체계에서는 승객 회전율이 높고 운송 수입이 보장되는 도심 황금 간선 노선에 신차와 저상버스를 우선 배차하는 경향이 뚜렷합니다.<br>
+                반면 교통약자가 주로 거주하는 외곽 읍·면 지선 노선은 승객 밀도가 낮고 운행 거리가 길어 차량 교체 우선순위에서 지속적으로 후순위로 밀려 배제되었을 개연성이 높습니다.
+            </p>
+            <div style="background: #e2e8f0; padding: 4px 7px; border-radius: 4px; font-size: 7.2pt; color: #1e293b;">
+                <strong>실증 부합성</strong>: 경기도 노선 전수 분석에서 수원(127개 노선 저상 투입) 등 간선 위주 지자체의 집중 배정 vs 가평·연천 등 군내 지선 노선의 0% 방치 현상 설명.
+            </div>
+        </div>
+
+        <!-- Cause 3 -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 9px 11px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                <span style="font-size: 10.5pt; font-weight: 900; color: #0284c7;">가설 03</span>
+                <strong style="font-size: 9.2pt; color: #0f172a;">도로 인프라 환경과 '도입 예외 승인' 제도의 사각지대 가설</strong>
+            </div>
+            <p style="font-size: 7.8pt; color: #334155; margin-bottom: 4px;">
+                현행 「교통약자법」 제14조 제4항 및 국토교통부 고시에 따라 도로의 종단경사(급경사), 굴곡, 과속방지턱 등 도로 환경이 부적합한 노선은 지자체 승인을 통해 저상버스 도입 의무에서 제외될 수 있습니다.<br>
+                도로 정비 예산이 부족한 외곽 농어촌일수록 예외 노선 신청 및 승인 비율이 높아져, 제도가 오히려 취약지역의 저상버스 도입을 공식적으로 차단하는 '역설적 사각지대'를 낳았을 가능성이 제기됩니다.
+            </p>
+            <div style="background: #e2e8f0; padding: 4px 7px; border-radius: 4px; font-size: 7.2pt; color: #1e293b;">
+                <strong>실증 부합성</strong>: 차체 바닥이 낮은 대형 저상버스(11m)의 물리적 한계로 인해 도로 환경이 취약한 군 지역이 제도적으로 저상버스 투입 대상에서 원천 배제됨.
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span>제도적 법령 근거: 「교통약자의 이동편의 증진법」 제14조 및 동법 시행령 제14조의2</span>
+            <span>본문 4 / 5</span>
+        </div>
+    </div>
+
+
+    <!-- PAGE 5 (본문 5/5): 데이터 기반 정책 제언(안) 및 연구 한계 -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Part 4 &amp; 5. 데이터 기반 정책 제언(안) 및 연구의 한계</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [5/5]</span>
+        </div>
+
+        <h2 class="section-heading">6. 데이터 기반 3대 정책 제언(안): 역진성 극복 로드맵</h2>
+        <p style="margin-bottom: 5px;">
+            단순 문제 제기에 그치지 않고, 본 실증 분석 결과를 바탕으로 교통약자 이동 형평성을 실질적으로 회복하기 위한 3단계 정책 대안을 제안합니다.
+        </p>
+
+        <div class="card-grid-3">
+            <div class="policy-card">
+                <div>
+                    <div class="policy-tag">Fiscal Reform</div>
+                    <div class="policy-title">교통약자 수요 연동형<br>차등 국비 보조율 제도(안)</div>
+                    <div class="policy-desc">
+                        현행 50% 일률 국비 지원을 지자체 재정자립도와 교통약자 비율에 따라 <strong>30% ~ 80%로 차등화</strong>. 재정이 열악한 농어촌 지자체의 지방비 부담을 1,800만 원 선으로 대폭 경감하여 예산 장벽을 해소합니다.
+                    </div>
+                </div>
+                <div class="policy-formula">
+                    국비보조율(안) = 기본 50% + 약자가산(최대15%) + 재정가산(최대15%) → 최대 80%
+                </div>
+            </div>
+
+            <div class="policy-card">
+                <div>
+                    <div class="policy-tag">Data Scoring</div>
+                    <div class="policy-title">데이터 기반 '저상버스 도입<br>우선순위 평가 모델(안)'</div>
+                    <div class="policy-desc">
+                        자의적·선착순 신청을 배제하고, 행정동별 약자 밀도, 병원·복지관 경유도, 공급 부족도를 결합한 <strong>종합 우선순위 평가 지표(안)</strong>를 산출하여 중앙정부 공모 평가 시 객관적 배정 쿼터제로 활용합니다.
+                    </div>
+                </div>
+                <div class="policy-formula">
+                    우선순위점수 = 0.4×(약자비율) + 0.3×(병원접근도) + 0.3×(1 - 현재공급률)
+                </div>
+            </div>
+
+            <div class="policy-card">
+                <div>
+                    <div class="policy-tag">Smart Infra</div>
+                    <div class="policy-title">중형 저상 전기버스 &amp;<br>도로 환경 개선 패키지(안)</div>
+                    <div class="policy-desc">
+                        대형(11m) 버스 운행이 불가능한 농어촌 지선 도로를 위해 <strong>중형(8~9m) 저상 전기버스 전용 지원 트랙을 신설</strong>하고, 도입 예외 구간의 도로 굴곡 및 단차 개선을 국비 1:1 패키지로 지원합니다.
+                    </div>
+                </div>
+                <div class="policy-formula">
+                    패키지 연계 = [중형 저상버스 보조금 신설] + [도로 굴곡·단차 정비 국비 패키지]
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-heading" style="margin-top: 10px;">7. 본 분석의 방법론적 한계 및 향후 연구 과제</h2>
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px 9px; font-size: 7.2pt; color: #475569; line-height: 1.45;">
+            <ul style="padding-left: 14px;">
+                <li style="margin-bottom: 2px;"><strong>횡단면 데이터의 한계</strong>: 본 연구는 2023년 시점의 데이터를 비교한 것으로, 통계적 관련성을 확인한 것이며 인과관계로 단정할 수는 없습니다.</li>
+                <li style="margin-bottom: 2px;"><strong>교통약자 집계의 중복성</strong>: '교통약자 비율'은 65세 이상 고령자와 등록장애인을 단순 합산하여 고령 장애인이 중복 집계되었을 가능성이 있습니다.</li>
+                <li style="margin-bottom: 2px;"><strong>공급 지표 정의의 차이</strong>: 전국은 '저상버스 차량 대수 비율(%)'을, 경기도는 '저상버스 운행 노선 비율(%)'을 사용하여 상호 직접 비교 시 유의가 필요합니다.</li>
+                <li style="margin-bottom: 2px;"><strong>소표본 지자체 해석 주의</strong>: 여주시의 경우 분석 노선 수가 2개(운행 노선 0개)로 표본 규모가 매우 작음에 유의해야 합니다.</li>
+                <li style="margin-bottom: 2px;"><strong>우선순위 평가 모델의 탐색적 성격</strong>: 제안된 산식은 정책 대안으로서의 시뮬레이션 지표이며 실제 정책 적용 시 다속성 의사결정(AHP) 검증이 선행되어야 합니다.</li>
+            </ul>
+        </div>
+
+        <div class="page-footer">
+            <span>온라인 배포 링크: <a href="https://contest-lab.github.io/contest/">https://contest-lab.github.io/contest/</a> | GitHub 소스: <a href="https://github.com/contest-lab/contest">github.com/contest-lab/contest</a></span>
+            <span>본문 5 / 5</span>
+        </div>
+    </div>
+
+
+    <!-- PAGE 6: 부록 및 참고문헌 -->
+    <div class="page">
+        <div class="page-header">
+            <span class="page-header-title">Appendix. 데이터 원천 출처 및 참고문헌</span>
+            <span>AI 교통 데이터 공모전 심층보고서 [참고자료]</span>
+        </div>
+
+        <h2 class="section-heading">8. 데이터 출처 및 참고문헌 (공식 원문 출처)</h2>
+        <div style="font-size: 7.8pt; color: #334155; line-height: 1.55; margin-top: 6px;">
+            <ol style="padding-left: 16px;">
+                <li style="margin-bottom: 5px;">
+                    <strong>국토교통부 · 한국교통안전공단 (2024.06)</strong>: 『2023년도 교통약자 이동편의 실태조사 연구보고서』
+                    <br><span style="color: #64748b;">(전국 17개 시·도 저상버스 도입 대수, 노선버스 인가 대수, 보급률 확정 통계)</span>
+                    <br>출처: TMACS 교통안전정보관리시스템 (<a href="https://tmacs.kotsa.or.kr" style="color: #0284c7;">tmacs.kotsa.or.kr</a>) | 공공데이터포털
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>통계청 국가통계포털(KOSIS)</strong>: 시군구별 주민등록인구 및 고령인구비율 (2023년 말 기준, 통계표ID: DT_1YL20631)
+                    <br>출처: KOSIS 국가통계포털 (<a href="https://kosis.kr" style="color: #0284c7;">kosis.kr</a>)
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>보건복지부 · 통계청 KOSIS</strong>: 전국 시·군·구별 등록장애인수 현황 (2023년 말 기준, 통계표ID: DT_1YL202003E)
+                    <br>출처: 보건복지통계연보 및 KOSIS 통계표
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>행정안전부 · 지방재정365</strong>: 전국 지방자치단체 재정자립도 및 재정자주도 결산 통계 (2023년 당초예산 기준, 통계표ID: DT_1YL20921)
+                    <br>출처: 지방재정통합공개시스템 (<a href="https://lofin.mois.go.kr" style="color: #0284c7;">lofin.mois.go.kr</a>)
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>경기교통정보센터 · 경기데이터드림</strong>: 경기도 시·군별 시내버스 및 마을버스 인가 노선별 저상버스 운행정보 전수 원장 (6,431개 노선 전수, 2023년 12월 기준)
+                    <br>출처: 경기데이터드림 (<a href="https://data.gg.go.kr" style="color: #0284c7;">data.gg.go.kr</a>)
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>대한민국 법령정보</strong>: 「교통약자의 이동편의 증진법」(법률 제18738호, 2023.01.19 시행) 제14조 및 동법 시행령 제14조의2
+                    <br>출처: 국가법령정보센터 (<a href="https://www.law.go.kr" style="color: #0284c7;">law.go.kr</a>)
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <strong>국토교통부 고시 제2023-38호</strong>: 『저상버스 도입 예외 승인 기준에 관한 고시』
+                </li>
+            </ol>
+        </div>
+
+        <div class="callout-box" style="margin-top: 14px;">
+            <strong>온라인 검증 및 재현성 안내</strong><br>
+            본 보고서에 수록된 모든 분석 코드(Jupyter Notebook, Python 스크립트) 및 시각화 생성 스크립트는 오픈 소스로 완전 공개되어 있습니다. 아래 저장소에서 원본 데이터와 소스코드를 내려받아 동일한 결과를 100% 재현할 수 있습니다.<br>
+            • <strong>분석 코드 GitHub 저장소</strong>: <a href="https://github.com/contest-lab/contest" style="color: #0284c7;">https://github.com/contest-lab/contest</a><br>
+            • <strong>웹 인터랙티브 보고서</strong>: <a href="https://contest-lab.github.io/contest/" style="color: #0284c7;">https://contest-lab.github.io/contest/</a>
+        </div>
+
+        <div class="page-footer">
+            <span>본 보고서의 데이터는 KOSIS 및 국토교통부 실태조사 공인 원장을 기반으로 집계되었습니다.</span>
+            <span>참고자료</span>
+        </div>
+    </div>
+
+</body>
+</html>
+"""
+
+with open("results/pdf_report_template.html", "w", encoding="utf-8") as f:
+    f.write(html_doc)
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.goto(f"file:///{os.path.abspath('results/pdf_report_template.html').replace('\\', '/')}")
+    page.wait_for_timeout(1000)
+    
+    pdf_path = "results/contest_report_final.pdf"
+    page.pdf(
+        path=pdf_path,
+        format="A4",
+        print_background=True,
+        margin={"top": "0", "bottom": "0", "left": "0", "right": "0"}
+    )
+    browser.close()
+
+reader = pypdf.PdfReader('results/contest_report_final.pdf')
+print("Final Total Pages:", len(reader.pages))

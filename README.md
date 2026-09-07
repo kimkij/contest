@@ -2,7 +2,7 @@
 ## - 전국 17개 시·도 및 경기도 31개 기초지자체(6,431개 버스 노선) 전수 분석 -
 
 > **대회명**: 한겨레 × (재단법인) 숲과나눔 주최 「AI와 함께하는 교통문제 해결을 위한 데이터 분석 공모전」  
-> **웹 보고서 인터랙티브 대시보드 (GitHub Pages)**: [https://kimkij.github.io/contest/](https://kimkij.github.io/contest/)  
+> **웹 보고서 인터랙티브 대시보드 (GitHub Pages)**: [https://contest-lab.github.io/contest/](https://contest-lab.github.io/contest/)  
 > **분석 주피터 노트북**: [notebooks/low_floor_bus_equity_analysis.ipynb](notebooks/low_floor_bus_equity_analysis.ipynb)
 
 ---

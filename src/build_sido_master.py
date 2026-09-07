@@ -1,77 +1,73 @@
 import pandas as pd
 
-def normalize_sido(name):
-    if not isinstance(name, str):
-        return ""
-    name = name.strip()
-    if "서울" in name: return "서울"
-    if "부산" in name: return "부산"
-    if "대구" in name: return "대구"
-    if "인천" in name: return "인천"
-    if "광주" in name: return "광주"
-    if "대전" in name: return "대전"
-    if "울산" in name: return "울산"
-    if "세종" in name: return "세종"
-    if "경기" in name: return "경기"
-    if "강원" in name: return "강원"
-    if "충북" in name or "충청북" in name: return "충북"
-    if "충남" in name or "충청남" in name: return "충남"
-    if "전북" in name or "전라북" in name: return "전북"
-    if "전남" in name or "전라남" in name: return "전남"
-    if "경북" in name or "경상북" in name: return "경북"
-    if "경남" in name or "경상남" in name: return "경남"
-    if "제주" in name: return "제주"
-    return name
-
-# 1. Bus
+# 1. Bus Data
 df_bus = pd.read_csv("data/low_floor_bus_2023_by_sido.csv")
-df_bus['key'] = df_bus['region'].apply(normalize_sido)
 
-# 2. Disabled
+# 2. Disabled Data from KOSIS (DT_1YL202003E)
 df_dis = pd.read_csv("data/kosis_disabled_sigungu_2023.csv")
-df_dis['key'] = df_dis['C1_NM'].apply(normalize_sido)
-# filter to 17 sidos
-sido_keys = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주']
-df_dis_sido = df_dis[df_dis['key'].isin(sido_keys) & (df_dis['C1_NM'] != '제주시')].copy()
-df_dis_sido['disabled_pop'] = pd.to_numeric(df_dis_sido['DT'], errors='coerce')
-df_dis_map = df_dis_sido.set_index('key')['disabled_pop'].to_dict()
 
-# 3. Elderly & Total Pop
+# 3. Elderly & Total Pop Data from KOSIS (DT_1YL20631)
 df_eld = pd.read_csv("data/kosis_elderly_sigungu_2023.csv")
-df_eld['key'] = df_eld['C1_NM'].apply(normalize_sido)
-df_eld_sido = df_eld[df_eld['key'].isin(sido_keys) & (df_eld['C1_NM'] != '제주시')].copy()
 
-# Total pop
-df_tot = df_eld_sido[df_eld_sido['ITM_NM'].str.contains("전체인구", na=False)].copy()
-df_tot['total_pop'] = pd.to_numeric(df_tot['DT'], errors='coerce')
-tot_pop_map = df_tot.set_index('key')['total_pop'].to_dict()
-
-# Elderly rate
-df_er = df_eld_sido[df_eld_sido['ITM_NM'].str.contains("고령인구비율", na=False)].copy()
-df_er['elderly_rate'] = pd.to_numeric(df_er['DT'], errors='coerce')
-eld_rate_map = df_er.set_index('key')['elderly_rate'].to_dict()
-
-# 4. Fiscal independence
+# 4. Fiscal Independence Data from KOSIS (DT_1YL20921)
 df_fis = pd.read_csv("data/kosis_fiscal_sigungu_2023.csv")
-df_fis['key'] = df_fis['C1_NM'].apply(normalize_sido)
-# take the modern accounting definition (세입과목개편후) if available, or first
-df_fis_sido = df_fis[df_fis['key'].isin(sido_keys)].drop_duplicates(subset=['key']).copy()
-df_fis_sido['fiscal_rate'] = pd.to_numeric(df_fis_sido['DT'], errors='coerce')
-fiscal_map = df_fis_sido.set_index('key')['fiscal_rate'].to_dict()
 
-# Build merged master dataframe
-df_master = df_bus.copy()
-df_master['total_pop'] = df_master['key'].map(tot_pop_map)
-df_master['disabled_pop'] = df_master['key'].map(df_dis_map)
-df_master['elderly_rate'] = df_master['key'].map(eld_rate_map)
-df_master['fiscal_rate'] = df_master['key'].map(fiscal_map)
+# Exact mapping between bus region name and KOSIS C1_NM
+sido_kosis_map = {
+    '서울특별시': '서울특별시',
+    '부산광역시': '부산광역시',
+    '대구광역시': '대구광역시',
+    '인천광역시': '인천광역시',
+    '광주광역시': '광주광역시',
+    '대전광역시': '대전광역시',
+    '울산광역시': '울산광역시',
+    '세종특별자치시': '세종특별자치시',
+    '경기도': '경기도',
+    '강원특별자치도': '강원특별자치도',
+    '충청북도': '충청북도',
+    '충청남도': '충청남도',
+    '전라북도': '전북특별자치도',
+    '전라남도': '전라남도',
+    '경상북도': '경상북도',
+    '경상남도': '경상남도',
+    '제주특별자치도': '제주특별자치도'
+}
 
-# Calculate Disabled pop rate (%)
-df_master['disabled_rate'] = (df_master['disabled_pop'] / df_master['total_pop']) * 100
-# Combined Transportation Vulnerable Population Rate (%)
-# 교통약자(장애인+고령자) 추정 비율 (%)
-df_master['vulnerable_rate'] = df_master['elderly_rate'] + df_master['disabled_rate']
+records = []
+for idx, r in df_bus.iterrows():
+    region = r['region']
+    kosis_name = sido_kosis_map[region]
+    
+    # Disabled population (note: Jeju is recorded as '제주도' in the disabled dataset)
+    dis_name = '제주도' if kosis_name == '제주특별자치도' else kosis_name
+    r_dis = df_dis[df_dis['C1_NM'] == dis_name]
+    dis_pop = float(r_dis['DT'].values[0])
+    
+    # Elderly rate and Total population
+    r_eld = df_eld[df_eld['C1_NM'] == kosis_name]
+    tot_pop = float(r_eld[r_eld['ITM_NM'].str.contains('전체인구')]['DT'].values[0])
+    eld_rate = float(r_eld[r_eld['ITM_NM'].str.contains('고령인구비율')]['DT'].values[0])
+    
+    # Fiscal independence (세입과목개편전 standard)
+    r_fis = df_fis[df_fis['C1_NM'] == kosis_name]
+    fis_rate = float(r_fis[r_fis['ITM_NM'].str.contains('세입과목개편전')]['DT'].values[0])
+    
+    # Calculations
+    dis_rate = (dis_pop / tot_pop) * 100.0
+    vul_rate = eld_rate + dis_rate
+    
+    rec = dict(r)
+    rec['key'] = region[:2]
+    rec['total_pop'] = tot_pop
+    rec['disabled_pop'] = dis_pop
+    rec['elderly_rate'] = eld_rate
+    rec['disabled_rate'] = dis_rate
+    rec['vulnerable_rate'] = vul_rate
+    rec['fiscal_rate'] = fis_rate
+    records.append(rec)
+
+df_master = pd.DataFrame(records)
 
 df_master.to_csv("data/sido_master_complete.csv", index=False, encoding="utf-8-sig")
-print("Saved data/sido_master_complete.csv successfully!")
-print(df_master[['region', 'city_bus_rate', 'total_rate', 'elderly_rate', 'disabled_rate', 'vulnerable_rate', 'fiscal_rate']])
+print("Saved data/sido_master_complete.csv successfully with exact 17 sido KOSIS metrics!")
+print(df_master[['region', 'total_pop', 'disabled_pop', 'elderly_rate', 'disabled_rate', 'vulnerable_rate', 'fiscal_rate', 'total_rate']])

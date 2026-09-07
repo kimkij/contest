@@ -14,12 +14,12 @@
     "region": "부산광역시",
     "total_rate": 29.9,
     "city_bus_rate": 36.4,
-    "vulnerable_rate": 27.3,
-    "disabled_rate": 5.19,
-    "elderly_rate": 22.1,
+    "vulnerable_rate": 27.9,
+    "disabled_rate": 5.32,
+    "elderly_rate": 22.6,
     "fiscal_rate": 53.2,
     "total_low": 923,
-    "total_pop": 359508
+    "total_pop": 3293362
   },
   {
     "region": "대구광역시",
@@ -28,7 +28,7 @@
     "vulnerable_rate": 25.1,
     "disabled_rate": 5.49,
     "elderly_rate": 19.6,
-    "fiscal_rate": 32.1,
+    "fiscal_rate": 52.3,
     "total_low": 728,
     "total_pop": 2374960
   },
@@ -47,12 +47,12 @@
     "region": "광주광역시",
     "total_rate": 34.8,
     "city_bus_rate": 37.7,
-    "vulnerable_rate": 20.9,
-    "disabled_rate": 4.46,
-    "elderly_rate": 16.4,
+    "vulnerable_rate": 21.4,
+    "disabled_rate": 4.88,
+    "elderly_rate": 16.5,
     "fiscal_rate": 46.2,
     "total_low": 394,
-    "total_pop": 391377
+    "total_pop": 1419237
   },
   {
     "region": "대전광역시",

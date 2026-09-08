@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AI와 함께하는 교통문제 해결 데이터 분석 공모전 보고서</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            font-size: 10pt;
+        }
+        h1 { font-size: 17pt; color: #1a365d; border-bottom: 2.5px solid #2b6cb0; padding-bottom: 6px; margin-top: 10px; }
+        h2 { font-size: 13pt; color: #2b6cb0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-top: 22px; }
+        h3 { font-size: 11pt; color: #2d3748; margin-top: 16px; border-left: 3.5px solid #3182ce; padding-left: 7px; }
+        h4 { font-size: 10pt; color: #4a5568; margin-top: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 8.8pt; }
+        th, td { border: 1px solid #cbd5e0; padding: 6px 8px; text-align: left; }
+        th { background-color: #ebf8ff; color: #2b6cb0; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f7fafc; }
+        ul, ol { padding-left: 18px; margin: 6px 0; }
+        li { margin-bottom: 4px; }
+        p { margin: 6px 0; text-align: justify; }
+        .chart-box { text-align: center; margin: 18px 0; page-break-inside: avoid; }
+        .chart-box img { width: 95%; border: 1px solid #e2e8f0; border-radius: 4px; }
+        .caption { font-size: 8.5pt; color: #718096; margin-top: 4px; font-weight: bold; }
+        .summary-box { background-color: #f8fafc; border: 1px solid #cbd5e0; border-left: 4px solid #3182ce; border-radius: 4px; padding: 12px; margin: 15px 0; }
+        .page-break { page-break-after: always; }
+        strong { color: #1a202c; }
+    </style>
+</head>
+<body>
+<h1>[분석보고서] 저상버스 도입의 공간적 불일치와 교통복지 역진성 규명</h1>
+<h2>- 전국 17개 시·도 및 경기도 31개 기초지자체 버스 노선 전수 분석을 중심으로 -</h2>
+<p><strong>대회명</strong>: AI와 함께하는 교통문제 해결을 위한 데이터 분석 공모전 (한겨레 × 재단법인 숲과나눔)</p>
+<p><strong>작성일</strong>: 2026년 9월</p>
+<p><strong>분석 코드 및 데이터셋 저장소</strong>: GitHub / Local Repository (`./src`, `./data`)</p>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>[요약 (Executive Summary)]</h3>
+<ul><li>**연구 배경 및 목적**: 2023년 「교통약자의 이동편의 증진법」 개정에 따라 노선버스 대폐차 시 저상버스 도입이 의무화되었으나, 실제 예산과 차량 공급이 교통약자(등록장애인 및 65세 이상 고령자) 밀집 지역에 우선 배정되고 있는지 실증적으로 검증된 바 없음. 본 연구는 국가 통계 및 기초지자체 버스 노선 전수 데이터를 활용하여 저상버스 배정의 공간적 형평성을 검증하고자 함.</li></ul>
+<ul><li>**주요 실증 결과**:</li></ul>
+<ol><li>**전국 17개 시·도 단위 분석**: 교통약자 비율과 저상버스 도입률 간에 **유의미한 음의 상관관계($r = -0.435$, 등록장애인 $r = -0.573$)**가 확인됨. 교통약자 비율이 33.7%로 전국 최고 수준인 전남은 도입률이 11.5%에 불과한 반면, 교통약자 비율이 22.6%인 서울은 56.8%에 달함.</li></ol>
+<ol><li>**경기도 31개 시·군 6,431개 버스 노선 전수 분석**: 교통약자 비율이 높을수록 저상버스 운행 노선 비율이 통계적으로 유의미하게 감소($r = -0.430, t = -2.56, p < 0.05$). 회귀분석 결과 교통약자 비율이 1%p 높을수록 저상버스 노선 비율은 오히려 1.14%p 감소하는 **'역진적 배정(Regressive Allocation)'**이 발생함.</li></ol>
+<ol><li>**구조적 원인**: 현행 '국비-지방비 50:50 정률 매칭 방식'으로 인해 재정자립도가 열악한 군 단위 지자체(14~20%)는 매칭 예산을 확보하지 못해 신청을 포기하고, 재정이 풍부한 대도시(50~80%)가 예산을 독식하는 구조적 한계 규명.</li></ol>
+<ul><li>**정책 제언**:</li></ul>
+<ol><li>지자체 재정자립도 및 교통약자 밀집도에 비례하는 **'수요 연동형 차등 보조율 제도(국비 50% → 최대 80%)'** 개편.</li></ol>
+<ol><li>머신러닝 기반 **'저상버스 우선투입 지수(LBEI: Low-floor Bus Equity Index)'** 산출 및 중앙정부 공모 평가 가점 연계.</li></ol>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>1. 서론: 연구 배경 및 문제 제기</h3>
+<h4>1.1 연구 배경</h4>
+<ul><li>대한민국은 초고령화 사회 진입을 앞두고 있으며, 이동에 제약을 받는 고령인구와 등록장애인 등 교통약자 규모는 매년 증가하고 있음.</li></ul>
+<ul><li>정부는 2023년 1월부터 노선버스 대폐차 시 저상버스 도입을 의무화하고 제4차 교통약자 이동편의 증진계획(2022~2026)을 통해 전국 저상버스 보급률 목표를 상향 설정함.</li></ul>
+<h4>1.2 문제 제기: "진짜 필요한 곳에 먼저 가고 있는가?"</h4>
+<ul><li>저상버스는 단순한 차량 교체가 아닌 막대한 국민 세금(대당 약 9,000만 원 내외의 국비+지방비 보조금)이 투입되는 복지 인프라 사업임.</li></ul>
+<ul><li>그러나 현실에서는 "출퇴근 수요가 많은 대도시 간선노선 위주로 우선 배차되고, 정작 거동이 불편한 고령자와 장애인이 밀집한 농어촌·외곽 지역은 저상버스를 구경조차 하기 어렵다"는 현장의 비판이 지속됨.</li></ul>
+<ul><li>**연구 가설**: *"저상버스 확충 예산 및 도입은 교통약자(장애인·고령인구) 밀집 지역에 우선 배정되었을 것이다."*</li></ul>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>2. 데이터 수집 및 분석 프레임워크</h3>
+<p>공공데이터포털, KOSIS(국가통계포털), 국토교통부, 한국교통안전공단(TMACS)의 데이터를 융합하여 전국 거시 분석과 수도권 미시 전수 분석을 동시에 수행함.</p>
+<table>
+  <tr><th>분석 층위</th><th>분석 대상</th><th>활용 데이터셋</th><th>출처</th></tr>
+  <tr><td>**거시 분석 (전국)**</td><td>전국 17개 광역 시·도</td><td>• 지역별 저상버스 도입현황 (시내/농어촌/마을버스)<br>• 시도별 등록장애인 수 (유형별)<br>• 시도별 65세 이상 고령인구 및 고령화율<br>• 지자체 재정자립도</td><td>국토교통부·TMACS<br>보건복지부 / KOSIS<br>행정안전부 / KOSIS<br>지방재정연감</td></tr>
+  <tr><td>**미시 분석 (기초)**</td><td>경기도 31개 시·군 (6,431개 버스노선)</td><td>• 경기도 버스노선별 저상버스 유무 현황 (전수)<br>• 31개 시군별 등록장애인 및 고령인구<br>• 31개 시군별 재정자립도</td><td>경기데이터드림<br>KOSIS OpenAPI<br>지방재정365</td></tr>
+</table>
+<ul><li>**핵심 지표 정의**:</li></ul>
+<ul><li>**수요 지표 ($\text{Vulnerable Rate}$)**: $\text{고령인구 비율(\%)} + \text{등록장애인 비율(\%)}$</li></ul>
+<ul><li>**공급 지표 ($\text{Supply Rate}$)**: 전국 단위 = 전체 버스 중 저상버스 보급률(%), 시군 단위 = 전체 버스 노선 중 저상버스 운행 노선 비율(%)</li></ul>
+<ul><li>**통제 지표 ($\text{Fiscal Rate}$)**: 지자체 재정자립도(%)</li></ul>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>3. 실증 분석 결과: "가설의 역설적 기각 (역진적 배정의 발견)"</h3>
+<h4>3.1 [거시 실증] 전국 17개 시·도의 공간적 불평등</h4>
+<ul><li>분석 결과, 가설과 정반대로 **교통약자가 많은 시·도일수록 저상버스 보급률이 현저히 낮음**이 입증됨.</li></ul>
+<ul><li>**저상버스 보급률 vs 등록장애인 비율**: $r = -0.573$ ($t = -2.71$)</li></ul>
+<ul><li>**저상버스 보급률 vs 교통약자 통합 비율**: $r = -0.435$ ($t = -1.87$)</li></ul>
+<ul><li>**저상버스 보급률 vs 재정자립도**: $r = +0.495$ ($t = +2.21$)</li></ul>
+<ul><li>**극단적 격차 비교**:</li></ul>
+<ul><li>**최우수 지역 (서울)**: 교통약자 비율 22.6%, 재정자립도 81.2% $\rightarrow$ **저상버스 보급률 56.8% (시내버스 66.7%)**</li></ul>
+<ul><li>**최하위 지역 (전남)**: 교통약자 비율 33.7%, 재정자립도 28.7% $\rightarrow$ **저상버스 보급률 11.5% (시내버스 20.3%)**</li></ul>
+<ul><li>전남의 교통약자 비율은 서울보다 11.1%p나 높지만, 저상버스 혜택은 서울의 5분의 1 수준에 그침.</li></ul>
+<h4>3.2 [미시 실증] 경기도 31개 시·군 버스 노선 6,431개 전수 분석</h4>
+<ul><li>경기도 31개 시·군의 6,431개 버스 노선 중 저상버스가 운행되는 노선은 1,610개(25.0%)에 불과함.</li></ul>
+<ul><li>시군별 저상버스 노선 보유율과 교통약자 비율 간 상관계수는 **$r = -0.430$ ($t = -2.56, p < 0.05$)**로 통계적으로 유의미한 음의 관계를 보임.</li></ul>
+<ul><li>**다중회귀분석 (OLS Model)**:</li></ul>
+<p>$$\text{저상버스 노선비율(\%)} = 46.50 - 1.14 \times \text{교통약자비율} + 0.14 \times \text{재정자립도} \quad (R^2 = 0.188)$$</p>
+<ul><li>다른 변수를 통제하더라도 **교통약자 비율이 1%p 높은 시군일수록 저상버스 노선 비율은 1.14%p 떨어짐**.</li></ul>
+<ul><li>**4분면 매트릭스 분석 결과 (소외지역 도출)**:</li></ul>
+<ul><li>**투자 집중구역 (수요 낮음, 공급 높음)**: 하남(63.9%), 광명(62.7%), 부천(59.6%), 수원(52.7%) $\rightarrow$ 재정자립도 35~50%의 도심권.</li></ul>
+<ul><li>**제1우선 소외구역 (수요 극대, 공급 바닥)**: 가평(0%), 연천(0%), 여주(0%), 동두천(5.0%), 포천(11.8%) $\rightarrow$ 교통약자 비율 30~39%, 재정자립도 14~20%의 외곽·접경 지역.</li></ul>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>4. 구조적 원인 진단: 왜 역진적 배정이 일어나는가?</h3>
+<ol><li>**정률 매칭(50:50) 보조금 구조의 함정**:</li></ol>
+<ul><li>중앙정부는 저상버스 도입 보조금을 정률(서울 40%, 지방 50%)로 매칭 지원함.</li></ul>
+<ul><li>재정자립도가 10~20%대에 불과한 군 단위 지자체는 자체 부담금(대당 수천만 원)을 감당할 수 없어 신차 교체 시 저상버스 보조금 신청 자체를 포기함.</li></ul>
+<ol><li>**이용객 수 중심의 운수회사 인센티브**:</li></ol>
+<ul><li>버스 준공영제 및 민간 운수회사는 탑승객이 많은 간선·황금노선 위주로 신차를 우선 투입하여 수익성을 극대화함.</li></ul>
+<ol><li>**도로 인프라 미비와 '예외 승인'의 악순환**:</li></ol>
+<ul><li>농어촌·산간 지역 도로는 굴곡, 급경사, 높은 방지턱으로 인해 저상버스 운행 불가 '예외 노선'으로 쉽게 지정되어 제도적 사각지대로 방치됨.</li></ul>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>5. 정책 제언: AI 기반 교통복지 형평성 회복 방안</h3>
+<h4>5.1 [재정 개편] '교통약자 수요 연동형 차등 보조율 제도' 도입</h4>
+<ul><li>현행 일률 50% 국비 지원을 지자체 교통약자 비율 및 재정자주도에 따라 **30% ~ 80%로 차등화**.</li></ul>
+<ul><li>가평·연천·전남 등 재정력이 취약한 소외지역에는 국비 매칭률을 80%까지 파격 상향하여 지자체 재정 부담 제거.</li></ul>
+<h4>5.2 [AI 알고리즘] '저상버스 우선투입 지수(LBEI)' 공모 평가 의무화</h4>
+<ul><li>머신러닝 기반의 도입 우선순위 스코어링 모델 구축:</li></ul>
+<p>$$\text{LBEI} = 0.4 \times (\text{행정동별 고령·장애인 밀도}) + 0.3 \times (\text{노선 내 복지시설 경유도}) + 0.3 \times (1 - \text{현재 저상버스 공급률})$$</p>
+<ul><li>중앙정부 예산 배정 시 LBEI 상위 노선 및 지자체에 우선 배정 쿼터제 시행.</li></ul>
+<h4>5.3 [인프라] 농어촌 도로 굴곡부 개선 및 중형 저상버스 집중 도입</h4>
+<ul><li>대형 저상버스가 진입하기 어려운 농어촌 도로를 위해 '중형 저상 전기버스' 보조금 트랙 신설 및 도로 개선 예산 패키지 지원.</li></ul>
+<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;'>
+<h3>[부록 및 참고자료]</h3>
+<ul><li>[분석 데이터 1] `data/sido_master_complete.csv` (전국 17개 시도 지표)</li></ul>
+<ul><li>[분석 데이터 2] `data/gyeonggi_master_analysis.csv` (경기도 31개 시군 지표)</li></ul>
+<ul><li>[시각화 차트 1] `results/chart_sido_disparity.png` (전국 시도 격차 비교)</li></ul>
+<ul><li>[시각화 차트 2] `results/chart_quadrant_matrix.png` (경기도 31개 시군 4분면 매트릭스)</li></ul>
+<ul><li>[시각화 차트 3] `results/analysis_scatter_plot.png` (전국 및 경기도 통합 산점도 및 회귀선)</li></ul>
+
+<div class="page-break"></div>
+<h2>[시각화 1] 전국 및 경기도 실증 분석 산점도 및 추세선</h2>
+<div class="chart-box">
+    <img src="analysis_scatter_plot.png">
+    <div class="caption">&lt;그림 1&gt; 전국 17개 시도 및 경기도 31개 시군의 교통약자 비율 대비 저상버스 보급 현황 (역진적 배정 실증)</div>
+</div>
+
+<h2>[시각화 2] 전국 17개 시·도 도입률 및 취약계층 격차</h2>
+<div class="chart-box">
+    <img src="chart_sido_disparity.png">
+    <div class="caption">&lt;그림 2&gt; 17개 광역 시도별 저상버스 도입률 (20% 미만 취약지역 집중 분석)</div>
+</div>
+
+<div class="page-break"></div>
+<h2>[시각화 3] 경기도 31개 시·군 수요-공급 4분면 매트릭스</h2>
+<div class="chart-box">
+    <img src="chart_quadrant_matrix.png">
+    <div class="caption">&lt;그림 3&gt; 경기도 시군별 교통약자 수요 vs 공급 4분면 매트릭스 (제1우선 소외지대 vs 자원집중지대 도출)</div>
+</div>
+
+</body>
+</html>

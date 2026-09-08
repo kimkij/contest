@@ -6,4 +6,6 @@ __pycache__/
 .tempmediaStorage/
 data/seoul_routes.csv
 data/gyeonggi_routes.csv
-data/tmacs_report_29.pdf
+data/tmacs_report_*.pdf
+data/raw_supplement/*.xlsx
+data/raw_supplement/과속방지턱정보.csv
